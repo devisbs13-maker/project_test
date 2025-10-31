@@ -11,6 +11,9 @@ export function initTelegram() {
   const tg = getTG();
   if (!tg) return;
   try {
+    // Signal to Telegram that the app is ready to be shown
+    // This removes the initial black placeholder in the WebView
+    tg.ready?.();
     tg.expand();
     tg.setBackgroundColor('#0b0b0b');
   } catch {
