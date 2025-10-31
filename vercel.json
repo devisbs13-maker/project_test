@@ -4,5 +4,8 @@
     { "src": "apps/web/package.json", "use": "@vercel/static-build", "config": { "distDir": "dist" } }
   ],
   "buildCommand": "npm ci && npm run build --prefix apps/web",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
 }
