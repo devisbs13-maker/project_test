@@ -4,7 +4,7 @@ import legacy from '@vitejs/plugin-legacy';
 import path from 'node:path';
 
 export default defineConfig({
-  base: '/project_test/',
+  base: '/',
   plugins: [
     react(),
     legacy({ targets: ['defaults', 'not IE 11'], modernPolyfills: true }),
