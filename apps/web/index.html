@@ -8,6 +8,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap&subset=cyrillic" rel="stylesheet" />
     <!-- Load Telegram WebApp SDK early so it's available before app scripts -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Immediately signal readiness to hide black placeholder in Telegram -->
+    <script>
+      try {
+        window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.ready();
+        window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.expand && window.Telegram.WebApp.expand();
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

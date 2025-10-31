@@ -10,6 +10,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap&subset=cyrillic" rel="stylesheet" />
     <!-- Load Telegram WebApp SDK early so it's available before app scripts -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Immediately signal readiness to hide black placeholder in Telegram -->
+    <script>
+      try {
+        window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.ready();
+        window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.expand && window.Telegram.WebApp.expand();
+      } catch (e) {}
+    </script>
     <script type="module" crossorigin src="/project_test/assets/index-CbdyLDFQ.js"></script>
     <link rel="stylesheet" crossorigin href="/project_test/assets/index-DBPLQBGw.css">
     <script type="module">import.meta.url;import("_").catch(()=>1);(async function*(){})().next();if(location.protocol!="file:"){window.__vite_is_modern_browser=true}</script>
