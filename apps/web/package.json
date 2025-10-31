@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "dev:web": "vite --host 127.0.0.1 --port 5173",
     "build:web": "vite build",
-    "preview:web": "vite preview --host 127.0.0.1 --port 5173"
+    "preview:web": "vite preview --host 127.0.0.1 --port 5173",
+    "deploy:docs": "rimraf ../../docs && vite build && cpy dist/** ../../docs --parents"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.59.20",
@@ -23,6 +24,8 @@
     "@types/react": "^18.3.10",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.3",
-    "vite": "^5.4.9"
+    "vite": "^5.4.9",
+    "cpy-cli": "^5.0.0",
+    "rimraf": "^5.0.0"
   }
 }
