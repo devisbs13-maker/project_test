@@ -1,7 +1,8 @@
 {
   "version": 2,
-  "builds": [{ "src": "apps/web/package.json", "use": "@vercel/static-build" }],
+  "builds": [
+    { "src": "apps/web/package.json", "use": "@vercel/static-build", "config": { "distDir": "dist" } }
+  ],
   "buildCommand": "npm ci && npm run build --prefix apps/web",
-  "outputDirectory": "apps/web/dist",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
