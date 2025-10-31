@@ -20,8 +20,23 @@ await server.register(rateLimit, {
   timeWindow: '1 minute',
 });
 
+// CORS: allow local dev and optionally extra origins via env.
+// Mixed content note: when the WebApp is served over HTTPS (GitHub Pages),
+// the API must also be HTTPS (e.g., via ngrok) — browsers block HTTPS→HTTP.
+const defaultOrigins = ['http://127.0.0.1:5173', 'http://127.0.0.1:5174'];
+const pagesOrigin = 'https://devisbs13-maker.github.io';
+const extra = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+const allowAny = String(process.env.CORS_ANY || '').toLowerCase() === 'true';
+const allowList = new Set([...defaultOrigins, pagesOrigin, ...extra]);
+
 await server.register(cors, {
-  origin: ['http://127.0.0.1:5173', 'http://127.0.0.1:5174'],
+  origin: allowAny ? true : (origin, cb) => {
+    if (!origin) return cb(null, true);
+    return cb(null, allowList.has(origin));
+  },
   credentials: true,
 });
 

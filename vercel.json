@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "builds": [{ "src": "apps/web/index.html", "use": "@vercel/static-build" }],
+  "routes": [{ "src": "/(.*)", "dest": "/apps/web/$1" }],
+  "framework": "vite",
+  "installCommand": "npm ci",
+  "buildCommand": "npm --prefix apps/web run build",
+  "outputDirectory": "apps/web/dist"
+}
