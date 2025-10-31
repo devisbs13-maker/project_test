@@ -1,0 +1,103 @@
+ .wrap {
+  width: 100%;
+  background: linear-gradient(180deg, #0f0f10, #16181d);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  padding: 20px;
+  color: #e8eef5;
+  box-sizing: border-box;
+}
+
+.header {
+  text-align: center;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  margin-bottom: 12px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 520px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.card:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 10px 30px rgba(216,180,106,0.18);
+  border-color: rgba(216,180,106,0.4);
+}
+
+.selected {
+  border-color: #c5a76a;
+  box-shadow: 0 0 20px rgba(197,167,106,0.4);
+}
+
+.emoji {
+  font-size: 24px;
+}
+.title {
+  font-weight: 700;
+}
+.desc {
+  font-size: 12px;
+  color: #a7b2c3;
+}
+
+.footer {
+  margin-top: 14px;
+  display: flex;
+  justify-content: center;
+}
+
+.backBtn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(216,180,106,0.18), rgba(216,180,106,0.06));
+  border: 1px solid rgba(216,180,106,0.28);
+  color: #e8eef5;
+  cursor: pointer;
+}
+
+.confirmBtn {
+  margin-left: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(120,216,150,0.18), rgba(120,216,150,0.06));
+  border: 1px solid rgba(120,216,150,0.28);
+  color: #e8eef5;
+  cursor: pointer;
+}
+.confirmBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.heroImage {
+  width: 100px;
+  height: auto;
+  margin: 0 auto;
+  filter: drop-shadow(0 6px 20px rgba(197,167,106,0.25));
+  transition: transform .3s ease, filter .3s ease;
+}
+.card:hover .heroImage {
+  transform: translateY(-2px) scale(1.04);
+  filter: drop-shadow(0 10px 28px rgba(197,167,106,0.35));
+}

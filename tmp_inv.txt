@@ -1,0 +1,30 @@
+﻿import s from './InventoryGrid.module.css';
+import type { Item } from '../store/player';
+
+type Props = {
+  items: Item[];
+  onEquip: (item: Item) => void;
+};
+
+const rarityBorder: Record<Item['rarity'], string> = {
+  common:   'rgba(255,255,255,0.10)',
+  uncommon: 'rgba(82,196,82,0.5)',
+  rare:     'rgba(82,156,255,0.5)',
+  epic:     'rgba(196,82,196,0.55)',
+};
+
+export default function InventoryGrid({ items, onEquip }: Props) {
+  items = Array.isArray(items) ? items : [];
+  return (
+    <div className={s.grid}>
+      {items.map(it => (
+        <button key={it.id} className={s.cell} style={{ borderColor: rarityBorder[it.rarity] }} title={`${it.name} РІР‚Сћ ${it.rarity}`} onClick={() => onEquip(it)}>
+          <span className={s.label}>{it.name}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+
+

@@ -1,0 +1,33 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.main {
+  flex: 1;
+  overflow: auto;
+  padding: 12px;
+}
+
+.nav {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+  padding: 8px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.2);
+}
+
+.nav a {
+  text-align: center;
+  padding: 8px 6px;
+  border-radius: 6px;
+  color: var(--text-color);
+  background: rgba(255,255,255,0.05);
+}
+
+.active {
+  outline: 2px solid var(--button-color);
+}
+

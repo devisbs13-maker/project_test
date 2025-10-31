@@ -1,0 +1,94 @@
+:root {
+  /* Палитра */
+  --bg: #0f1115;
+  --bg-2: #12141a;
+  --surface: rgba(255,255,255,0.04);
+  --text: #e8eef5;
+  --muted: #a7b2c3;
+
+  /* Золото и акценты */
+  --gold: #d8b46a;
+  --gold-weak: rgba(216,180,106,0.28);
+  --gold-weak2: rgba(216,180,106,0.18);
+
+  /* Тени и свечения */
+  --shadow: 0 14px 36px rgba(0,0,0,0.45);
+  --glow: 0 0 20px rgba(216,180,106,0.25);
+
+  /* Переменные для будущей замены на картинки */
+  --panel-bg: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+  --panel-border: 1px solid rgba(255,255,255,0.06);
+
+  --btn-bg: linear-gradient(180deg, var(--gold-weak2), rgba(216,180,106,0.06));
+  --btn-border: 1px solid var(--gold-weak);
+  --btn-radius: 14px;
+
+  --page-gradient: radial-gradient(1200px 800px at 70% -10%, rgba(216,180,106,0.12), transparent 60%);
+}
+
+/* Portrait sizing tokens */
+:root {
+  --hero-thumb-size-md: clamp(110px, 18vw, 168px);
+  --hero-thumb-size-lg: clamp(140px, 26vw, 220px);
+  --hero-thumb-radius: 14px;
+}
+
+html, body, #root {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+}
+
+* { box-sizing: border-box; }
+
+/* Buttons */
+.mire-btn:hover { filter: brightness(1.05); box-shadow: var(--shadow), var(--glow); }
+.mire-btn:disabled { opacity: .6; cursor: not-allowed; filter: none; box-shadow: var(--shadow); }
+
+/* View transitions and hero card */
+.view-enter { opacity: 0; transform: translateY(8px); }
+.view-enter-active { opacity: 1; transform: translateY(0); transition: opacity .18s ease, transform .18s ease; }
+.view-exit { opacity: 1; transform: translateY(0); }
+.view-exit-active { opacity: 0; transform: translateY(8px); transition: opacity .14s ease, transform .14s ease; }
+.heroCard {
+  display: grid; grid-template-columns: 84px 1fr; gap: 12px; align-items: center;
+  padding: 10px; border-radius: 16px; background: var(--panel-bg); border: var(--panel-border); box-shadow: var(--shadow);
+}
+.heroImg { width: 84px; height: 84px; object-fit: cover; border-radius: 12px; box-shadow: var(--glow); }
+.heroMeta { display: grid; gap: 4px; }
+.heroTitle { font-weight: 800; letter-spacing: .02em; }
+.heroDesc { opacity: .85; font-size: 12px; }
+
+/* --- Page background tweak --- */
+body {
+  background:
+    radial-gradient(800px 600px at 70% 0%, rgba(216,180,106,0.08), transparent 70%),
+    var(--bg);
+}
+
+/* --- Button states (metallic-like feel) --- */
+.mire-btn:hover {
+  filter: none;
+  background: linear-gradient(180deg, rgba(216,180,106,0.15), rgba(216,180,106,0.06));
+  box-shadow: var(--shadow), 0 0 18px rgba(216,180,106,0.25);
+}
+.mire-btn:active {
+  transform: translateY(1px) scale(0.995);
+  filter: brightness(0.95);
+}
+
+/* --- Panel fade-in animation --- */
+.fadeInUp {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeInUp .4s ease forwards;
+}
+@keyframes fadeInUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- View transitions helpers (если нужны для экранов) --- */
+.view-enter { opacity: 0; transform: translateY(8px); }
+.view-enter-active { opacity: 1; transform: translateY(0); transition: opacity .18s ease, transform .18s ease; }
+.view-exit { opacity: 1; transform: translateY(0); }
+.view-exit-active { opacity: 0; transform: translateY(8px); transition: opacity .14s ease, transform .14s ease; }

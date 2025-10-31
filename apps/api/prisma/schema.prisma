@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../.data/mirevald.db"
+}
+
+model User {
+  id     String @id
+  name   String
+  gold   Int    @default(0)
+  energy Int    @default(100)
+}
+
+model WeeklyScore {
+  id      String @id
+  userId  String
+  score   Int    @default(0)
+  weekKey String
+
+  @@index([weekKey, score])
+}
+
+model Clan {
+  id   String @id
+  name String
+  tag  String @unique
+  bank Int    @default(0)
+}
+
+model ClanMember {
+  userId String
+  clanId String
+
+  @@id([userId, clanId])
+}

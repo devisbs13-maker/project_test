@@ -1,0 +1,198 @@
+import { useEffect, useState } from "react";
+import styles from "./App.module.css";
+import { initTelegram } from "./lib/telegram";
+import CharacterSelect from "./screens/CharacterSelect";
+import Home from "./screens/Home";
+import Character from "./screens/Character";
+import Quests from "./screens/Quests";
+import Jobs from "./screens/Jobs";
+import Merchant from "./screens/Merchant";
+import Leaderboard from "./screens/Leaderboard";
+import type { Player, ClassId } from "./store/player";
+import { createPlayer, loadPlayer, savePlayer, addXp, tickEnergy } from "./store/player";
+import { showToast } from "./utils/notify";
+import { apiVerifyAuth } from "./utils/api";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import Square from "./screens/Square";
+import Progress from "./screens/Progress";
+import Clan from "./screens/Clan";
+import ClanBrowse from "./screens/ClanBrowse";
+import ClanCreate from "./screens/ClanCreate";
+import { updateStreakOnLogin, syncAchievementsWithPlayer } from "./utils/progression";
+
+type Screen = "start" | "selectClass" | "home" | "character" | "quests" | "jobs" | "merchant" | "leaderboard";
+
+export default function App() {
+  const location = useLocation();
+  const [screen, setScreen] = useState<Screen>("start");
+  const [player, setPlayer] = useState<Player | null>(null);
+
+  useEffect(() => {
+    initTelegram();
+  }, []);
+
+  useEffect(() => {
+    const p = loadPlayer();
+    if (p) {
+      setPlayer(p);
+      setScreen("home");
+      try { updateStreakOnLogin(); syncAchievementsWithPlayer(p); } catch {}
+    }
+  }, []);
+
+  useEffect(() => {
+    apiVerifyAuth().catch(()=>{});
+  }, []);
+
+  // Request notifications permission on first visit (optional)
+  useEffect(() => {
+    try {
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission().catch(()=>{});
+      }
+    } catch {}
+  }, []);
+
+  // Passive energy regeneration timer + visibility catch-up
+  useEffect(() => {
+    if (!player) return;
+    let prev = player;
+    const apply = () => {
+      if (!prev) return;
+      const updated = tickEnergy(prev);
+      if (updated.energy !== prev.energy || updated.lastEnergyTs !== prev.lastEnergyTs) {
+        // optional: notify when becomes full
+        if (prev.energy < prev.energyMax && updated.energy === updated.energyMax) {
+          try {
+            showToast("Energy full!");
+            const tg = (window as any).Telegram?.WebApp; tg?.sendData?.(JSON.stringify({ type:'energy_full' }));
+          } catch {}
+        }
+        setPlayer(updated);
+        savePlayer(updated);
+        prev = updated;
+      }
+    };
+    const id = setInterval(apply, 45000);
+    const onVis = () => { if (document.visibilityState === 'visible') apply(); };
+    document.addEventListener('visibilitychange', onVis);
+    return () => { clearInterval(id); document.removeEventListener('visibilitychange', onVis); };
+  }, [player]);
+
+  const onStart = () => setScreen("selectClass");
+
+  const handleConfirmClass = (classId: ClassId) => {
+    const p = createPlayer(classId);
+    savePlayer(p);
+    setPlayer(p);
+    setScreen("home");
+  };
+
+  const updatePlayer = (next: Player) => {
+    setPlayer(next);
+    savePlayer(next);
+  };
+
+  return (
+    <div className={styles.wrap}>
+      {screen === "start" && (
+        <ErrorBoundary>
+        <div className={`${styles.card} ${styles.fade}`}>
+          <div className={styles.logo}>MIREVALD</div>
+          <div className={styles.subtitle}>Welcome to MIREVALD!</div>
+          <button className={styles.btn} onClick={onStart}>Start Adventure</button>
+        </div>
+        </ErrorBoundary>
+      )}
+
+      {screen === "selectClass" && (
+        <ErrorBoundary>
+        <div className={styles.fade} style={{ width: "100%", maxWidth: 560 }}>
+          <CharacterSelect onBack={() => setScreen("start")} onConfirm={handleConfirmClass} />
+        </div>
+        </ErrorBoundary>
+      )}
+
+      {screen === "home" && player && location.pathname !== "/" && (
+        <ErrorBoundary>
+        <div className={styles.fade} style={{ width: "100%", maxWidth: 560 }}>
+          <Home
+            player={player}
+            setScreen={setScreen}
+            onUpdatePlayer={updatePlayer}
+            onOpenQuests={() => {
+              const next = addXp({ ...player, stats: { ...player.stats } }, 25);
+              updatePlayer(next);
+              alert(`XP: ${next.progress.xp}/${next.progress.xpToNext} • Lvl. ${next.progress.level}`);
+            }}
+            onOpenJobs={() => alert("Jobs coming soon")}
+            onOpenArena={() => alert("Arena (PvP) coming soon")}
+            onOpenGuild={() => alert("Guilds coming soon")}
+            onOpenCharacter={() => setScreen("character")}
+          />
+        </div>
+        </ErrorBoundary>
+      )}
+
+      {screen === "quests" && player && (
+        <ErrorBoundary>
+          <Quests player={player} onBack={() => setScreen("home")} onUpdatePlayer={(p)=>{ setPlayer(p); savePlayer(p); }} />
+        </ErrorBoundary>
+      )}
+
+      {screen === "jobs" && player && (
+        <ErrorBoundary>
+          <Jobs player={player} onBack={() => setScreen("home")} onUpdatePlayer={(p)=>{ setPlayer(p); savePlayer(p); }} />
+        </ErrorBoundary>
+      )}
+
+      {screen === "merchant" && player && (
+        <ErrorBoundary>
+          <Merchant player={player} onBack={() => setScreen("home")} onUpdatePlayer={(p)=>{ setPlayer(p); savePlayer(p); }} />
+        </ErrorBoundary>
+      )}
+
+      {screen === "leaderboard" && player && (
+        <ErrorBoundary>
+          <Leaderboard player={player} onBack={() => setScreen("home")} />
+        </ErrorBoundary>
+      )}
+
+      {screen === "character" && (
+        <ErrorBoundary>
+          {player ? (
+            <Character player={player} onBack={() => setScreen("home")} onUpdatePlayer={updatePlayer} />
+          ) : (
+            <div style={{padding:16, color:'#e8eef5'}}>Р В Р’В Р вЂ™Р’В Р В Р Р‹Р РЋРЎв„ўР В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’ВµР В Р’В Р В Р вЂ№Р В Р вЂ Р В РІР‚С™Р РЋРІвЂћСћ Р В Р’В Р вЂ™Р’В Р В РЎС›Р Р†Р вЂљР’ВР В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’В°Р В Р’В Р вЂ™Р’В Р В Р’В Р Р†Р вЂљР’В¦Р В Р’В Р вЂ™Р’В Р В Р’В Р Р†Р вЂљР’В¦Р В Р’В Р В Р вЂ№Р В Р вЂ Р В РІР‚С™Р Р†РІР‚С›РІР‚вЂњР В Р’В Р В Р вЂ№Р В Р вЂ Р В РІР‚С™Р вЂ™Р’В¦ Р В Р’В Р вЂ™Р’В Р В Р Р‹Р Р†Р вЂљР’ВР В Р’В Р вЂ™Р’В Р В Р Р‹Р Р†Р вЂљРІР‚СљР В Р’В Р В Р вЂ№Р В Р’В Р Р†Р вЂљРЎв„ўР В Р’В Р вЂ™Р’В Р В Р Р‹Р Р†Р вЂљРЎС›Р В Р’В Р вЂ™Р’В Р В Р Р‹Р Р†Р вЂљРЎСљР В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’В°. <button onClick={()=>setScreen("home")}>Р В Р’В Р вЂ™Р’В Р В Р Р‹Р РЋРЎв„ўР В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’В°Р В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’В·Р В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’В°Р В Р’В Р вЂ™Р’В Р В РЎС›Р Р†Р вЂљР’В</button></div>
+          )}
+        </ErrorBoundary>
+          <ErrorBoundary>
+            <Square player={player} onUpdatePlayer={updatePlayer} onBack={() => history.back()} />
+          </ErrorBoundary>
+        ) : undefined} />
+      <Route path="/progress" element={player ? (
+          <ErrorBoundary>
+            <Progress player={player} onBack={() => setScreen("home")} onUpdatePlayer={updatePlayer} />
+          </ErrorBoundary>
+        ) : undefined} />
+      <Route path="/clan" element={player ? (
+          <ErrorBoundary>
+            <Clan player={player} onBack={() => setScreen("home")} />
+          </ErrorBoundary>
+        ) : undefined} />
+      <Route path="/clan/browse" element={player ? (
+          <ErrorBoundary>
+            <ClanBrowse player={player} onBack={() => history.back()} />
+          </ErrorBoundary>
+        ) : undefined} />
+      <Route path="/clan/create" element={player ? (
+          <ErrorBoundary>
+            <ClanCreate player={player} onBack={() => history.back()} />
+          </ErrorBoundary>
+        ) : undefined} />
+        <Route path="*" element={<Navigate to="/" replace />} />`n      </Routes>
+    </div>
+  );
+}
+

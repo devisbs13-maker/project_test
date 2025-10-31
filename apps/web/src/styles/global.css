@@ -1,0 +1,26 @@
+:root {
+  color-scheme: light dark;
+  --bg-color: var(--tg-bg_color, #0e1621);
+  --text-color: var(--tg-text_color, #ffffff);
+  --hint-color: var(--tg-hint_color, #a0aab8);
+  --link-color: var(--tg-link_color, #61dafb);
+  --button-color: var(--tg-button_color, #2481cc);
+  --button-text-color: var(--tg-button_text_color, #ffffff);
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+a { color: var(--link-color); text-decoration: none; }
+
+h1 { font-size: 20px; margin: 12px 0; }
+p { color: var(--hint-color); }
+

@@ -1,0 +1,21 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.cell {
+  height: 64px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--panel-bg);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  font-size: 12px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform .08s ease, box-shadow .2s ease, filter .2s ease;
+}
+.cell:hover { box-shadow: var(--shadow), 0 0 16px rgba(216,180,106,0.25); filter: brightness(1.04); }
+.label { opacity: .9; padding: 0 6px; text-align: center; }
+
