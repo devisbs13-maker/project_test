@@ -18,8 +18,6 @@
         "build:bot": "npm run -w slav-rpg-bot build:bot",
         "build:shared": "npm run -w @repo/shared build",
         "start:bot": "npm run -w slav-rpg-bot start:bot",
-        "tunnel": "ngrok http http://127.0.0.1:5173",
-        "dev:all:tunnel": "run-p dev:web dev:bot tunnel",
         "migrate": "npm run -w @repo/api migrate",
     "seed": "npm run -w @repo/api seed",
     "encoding:fix": "bash scripts/fix-encoding.sh",
