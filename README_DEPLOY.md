@@ -1,4 +1,4 @@
-Vercel deployment for the Telegram WebApp (apps/web)
+ьзVercel deployment for the Telegram WebApp (apps/web)
 
 Steps
 
