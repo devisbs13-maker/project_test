@@ -22,7 +22,7 @@
     "seed": "npm run -w @repo/api seed",
     "encoding:fix": "bash scripts/fix-encoding.sh",
     "fix:bom": "node scripts/strip-bom.mjs",
-        "deploy:web": "vercel --cwd apps/web --prod"
+        "deploy:web": "npm run -w @repo/web deploy:docs"
   },
   "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^7.17.0",

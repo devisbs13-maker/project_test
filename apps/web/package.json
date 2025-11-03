@@ -10,7 +10,7 @@
     "dev:web": "vite --host 127.0.0.1 --port 5173",
     "build:web": "vite build",
     "preview:web": "vite preview --host 127.0.0.1 --port 5173",
-    "deploy:docs": "rimraf ../../docs && vite build && cpy dist/** ../../docs --parents"
+    "deploy:docs": "rimraf ../../docs && vite build && cpy dist/index.html dist --rename=404.html && cpy dist/** ../../docs --parents"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.59.20",

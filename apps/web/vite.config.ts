@@ -3,7 +3,8 @@ import react from '@vitejs/plugin-react';
 import path from 'node:path';
 
 export default defineConfig({
-  base: '/',
+  // GitHub Pages project URL base
+  base: '/project_test/',
   plugins: [react()],
   resolve: {
     alias: {
