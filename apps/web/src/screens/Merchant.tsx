@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+﻿import { useMemo, useState } from 'react';
 import Header from '../components/Header';
 import Button from '../components/Button';
 import type { Player, Item } from '../store/player';
@@ -57,7 +57,7 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
     const nextEco = { ...eco, offers };
     setEco(nextEco); saveEconomy(nextEco);
 
-    notifyAll('quest', 'Покупка', { gold: -offer.price });
+    notifyAll('quest', 'РџРѕРєСѓРїРєР°', { gold: -offer.price });
     const tg = (window as any).Telegram?.WebApp; tg?.sendData?.(JSON.stringify({ type:'purchase', title:def.name, price:offer.price, qty:1 }));
   }
 
@@ -72,7 +72,7 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
     const pNext: Player = { ...player, gold: player.gold - unitPrice, inventory: [...player.inventory, newItem] };
     savePlayer(pNext); onUpdatePlayer(pNext);
     try {
-      notifyAll('quest', 'Покупка', { gold: -unitPrice });
+      notifyAll('quest', 'РџРѕРєСѓРїРєР°', { gold: -unitPrice });
       const tg = (window as any).Telegram?.WebApp; tg?.sendData?.(JSON.stringify({ type:'purchase', title:def.name, price:unitPrice, qty:1 }));
     } catch {}
   }
@@ -92,24 +92,24 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
     const pNext: Player = { ...player, gold: player.gold + price, inventory: newInv };
     savePlayer(pNext); onUpdatePlayer(pNext);
 
-    notifyAll('quest', 'Продажа', { gold: price });
-    const tg = (window as any).Telegram?.WebApp; tg?.sendData?.(JSON.stringify({ type:'sale', title:def?.name ?? it.name ?? 'Товар', price, qty:1 }));
+    notifyAll('quest', 'РџСЂРѕРґР°Р¶Р°', { gold: price });
+    const tg = (window as any).Telegram?.WebApp; tg?.sendData?.(JSON.stringify({ type:'sale', title:def?.name ?? it.name ?? 'РўРѕРІР°СЂ', price, qty:1 }));
   }
 
   return (
     <div style={{display:'grid', gap:12, padding:16}}>
-      <Header title="Торговец" gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} />
+      <Header title="РўРѕСЂРіРѕРІРµС†" gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} />
 
       <div style={{display:'flex', gap:8}}>
-        <Button onClick={()=>setTab('buy')} disabled={tab==='buy'}>Купить</Button>
-        <Button onClick={()=>setTab('sell')} disabled={tab==='sell'}>Продать</Button>
+        <Button onClick={()=>setTab('buy')} disabled={tab==='buy'}>РљСѓРїРёС‚СЊ</Button>
+        <Button onClick={()=>setTab('sell')} disabled={tab==='sell'}>РџСЂРѕРґР°С‚СЊ</Button>
       </div>
 
       {tab==='buy' && (
         <section style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)'}}>
           <div style={{display:'flex', gap:8, marginBottom:8}}>
-            <Button onClick={()=>setCategory('resources')} disabled={category==='resources'}>Ресурсы</Button>
-            <Button onClick={()=>setCategory('clothing')} disabled={category==='clothing'}>Одежда</Button>
+            <Button onClick={()=>setCategory('resources')} disabled={category==='resources'}>Р РµСЃСѓСЂСЃС‹</Button>
+            <Button onClick={()=>setCategory('clothing')} disabled={category==='clothing'}>РћРґРµР¶РґР°</Button>
           </div>
 
           {category==='resources' && (
@@ -123,11 +123,11 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
                     <div style={{display:'flex', alignItems:'center', gap:10}}>
                       {def.image ? <img src={def.image} alt={def.name} style={{width:32,height:32,objectFit:'cover',borderRadius:6}} /> : <div style={{width:32,height:32,borderRadius:6,background:'rgba(255,255,255,0.07)'}} />}
                       <div>
-                        <div style={{fontWeight:700}}>{def.name} <span style={{color:rarityColor(def.rarity), fontSize:12, marginLeft:6}}>редкость: {def.rarity}</span></div>
-                        <div style={{opacity:.85, fontSize:12}}>Цена: ₽ {price}</div>
+                        <div style={{fontWeight:700}}>{def.name} <span style={{color:rarityColor(def.rarity), fontSize:12, marginLeft:6}}>СЂРµРґРєРѕСЃС‚СЊ: {def.rarity}</span></div>
+                        <div style={{opacity:.85, fontSize:12}}>Р¦РµРЅР°: в‚Ѕ {price}</div>
                       </div>
                     </div>
-                    <Button onClick={()=>buyFromCatalog(def.id)} disabled={cant}>Купить</Button>
+                    <Button onClick={()=>buyFromCatalog(def.id)} disabled={cant}>РљСѓРїРёС‚СЊ</Button>
                   </div>
                 );
               })}
@@ -143,21 +143,21 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
                     if (items.length===0) return null;
                     return (
                       <div key={`${cls}_t${tier}`} style={{display:'grid', gap:6}}>
-                        <div style={{opacity:.9, fontWeight:700}}>{`Сет ${cls} t${tier}`}</div>
+                        <div style={{opacity:.9, fontWeight:700}}>{`РЎРµС‚ ${cls} t${tier}`}</div>
                         {items.map(def => {
                           const base = Math.round(def.basePrice * rarityFactor(def.rarity));
                           const price = priceFor('buy', base, player);
-                          const cant = player.gold < price;
+                          const cant = player.gold < price; const locked = (((def as any).requiredLevel ?? 1) > player.progress.level) || (!!(def as any).classReq && (def as any).classReq !== player.classId);
                           return (
                             <div key={def.id} style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'8px 12px', borderRadius:12, background:'var(--panel-bg)', border:'1px solid rgba(255,255,255,0.08)'}}>
                               <div style={{display:'flex', alignItems:'center', gap:10}}>
                                 {def.image ? <img src={def.image} alt={def.name} style={{width:36,height:36,objectFit:'cover',borderRadius:6}} /> : <div style={{width:36,height:36,borderRadius:6,background:'rgba(255,255,255,0.07)'}} />}
                                 <div>
-                                  <div style={{fontWeight:700}}>{def.name} <span style={{color:rarityColor(def.rarity), fontSize:12, marginLeft:6}}>редкость: {def.rarity}</span></div>
-                                  <div style={{opacity:.85, fontSize:12}}>Цена: ₽ {price} {def.requiredLevel ? `• ур. ${def.requiredLevel}+` : ''}</div>
+                                  <div style={{fontWeight:700}}>{def.name} <span style={{color:rarityColor(def.rarity), fontSize:12, marginLeft:6}}>СЂРµРґРєРѕСЃС‚СЊ: {def.rarity}</span></div>
+                                  <div style={{opacity:.85, fontSize:12}}>Р¦РµРЅР°: в‚Ѕ {price} {def.requiredLevel ? `вЂў СѓСЂ. ${def.requiredLevel}+` : ''}</div>
                                 </div>
                               </div>
-                              <Button onClick={()=>buyFromCatalog(def.id)} disabled={cant}>Купить</Button>
+                              <Button onClick={()=>buyFromCatalog(def.id)} disabled={cant}>РљСѓРїРёС‚СЊ</Button>
                             </div>
                           );
                         })}
@@ -169,7 +169,7 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
             </div>
           )}
           <div style={{display:'grid', gap:8}}>
-            {eco.offers.length===0 && <div style={{opacity:.8}}>Сегодня товаров нет.</div>}
+            {eco.offers.length===0 && <div style={{opacity:.8}}>РЎРµРіРѕРґРЅСЏ С‚РѕРІР°СЂРѕРІ РЅРµС‚.</div>}
             {eco.offers.filter(o => { const d = defsById.get(o.itemId); return slotTab==='all' ? true : (d && d.slot===slotTab); }).map(o => {
               const def = defsById.get(o.itemId);
               if (!def) return null;
@@ -177,10 +177,10 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
               return (
                 <div key={o.itemId} style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 12px', borderRadius:12, background:'var(--panel-bg)', border:'1px solid rgba(255,255,255,0.08)'}}>
                   <div>
-                    <div style={{fontWeight:700}}>{def.name} <span style={{color:rarityColor(o.rarity), fontSize:12, marginLeft:6}}>Редкость: {o.rarity}</span></div>
-                    <div style={{opacity:.85, fontSize:12}}>Цена: 🪙 {o.price} • Доступно: {o.qty}</div>
+                    <div style={{fontWeight:700}}>{def.name} <span style={{color:rarityColor(o.rarity), fontSize:12, marginLeft:6}}>Р РµРґРєРѕСЃС‚СЊ: {o.rarity}</span></div>
+                    <div style={{opacity:.85, fontSize:12}}>Р¦РµРЅР°: рџЄ™ {o.price} вЂў Р”РѕСЃС‚СѓРїРЅРѕ: {o.qty}</div>
                   </div>
-                  <Button onClick={()=>buy(o.itemId)} disabled={cant}>{out? 'Нет в наличии' : 'Купить'}</Button>
+                  <Button onClick={()=>buy(o.itemId)} disabled={cant}>{out? 'РќРµС‚ РІ РЅР°Р»РёС‡РёРё' : 'РљСѓРїРёС‚СЊ'}</Button>
                 </div>
               );
             })}
@@ -191,17 +191,17 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
       {tab==='sell' && (
         <section style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)'}}>
           <div style={{display:'grid', gap:8}}>
-            {player.inventory.length===0 && <div style={{opacity:.8}}>У вас нет предметов для продажи.</div>}
+            {player.inventory.length===0 && <div style={{opacity:.8}}>РЈ РІР°СЃ РЅРµС‚ РїСЂРµРґРјРµС‚РѕРІ РґР»СЏ РїСЂРѕРґР°Р¶Рё.</div>}
             {player.inventory.map((it, idx) => {
               const def = defsById.get(it.id);
               const price = def ? sellPriceFor(def, player) : 10;
               return (
                 <div key={idx} style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 12px', borderRadius:12, background:'var(--panel-bg)', border:'1px solid rgba(255,255,255,0.08)'}}>
                   <div>
-                    <div style={{fontWeight:700}}>{it.name ?? def?.name ?? it.id} {def && <span style={{color:rarityColor(def.rarity), fontSize:12, marginLeft:6}}>Редкость: {def.rarity}</span>}</div>
-                    <div style={{opacity:.85, fontSize:12}}>Цена продажи: 🪙 {price}</div>
+                    <div style={{fontWeight:700}}>{it.name ?? def?.name ?? it.id} {def && <span style={{color:rarityColor(def.rarity), fontSize:12, marginLeft:6}}>Р РµРґРєРѕСЃС‚СЊ: {def.rarity}</span>}</div>
+                    <div style={{opacity:.85, fontSize:12}}>Р¦РµРЅР° РїСЂРѕРґР°Р¶Рё: рџЄ™ {price}</div>
                   </div>
-                  <Button onClick={()=>sell(idx)}>Продать</Button>
+                  <Button onClick={()=>sell(idx)}>РџСЂРѕРґР°С‚СЊ</Button>
                 </div>
               );
             })}

@@ -1,4 +1,4 @@
-import Header from '../components/Header';
+﻿import Header from '../components/Header';
 import PortraitCard from '../components/PortraitCard';
 import StatBar from '../components/StatBar';
 import InventoryGrid from '../components/InventoryGrid';
@@ -31,8 +31,8 @@ export default function Character({ player, onBack, onUpdatePlayer }: Props) {
 
   function equip(item: Item) {
     const slot = item.slot as ItemSlot;
-    if (item.classReq && item.classReq !== player.classId) { alert('Нельзя экипировать: другой класс'); return; }
-    if ((item.requiredLevel ?? 1) > player.progress.level) { alert(`Требуется ур. ${item.requiredLevel}`); return; }
+    if (item.classReq && item.classReq !== player.classId) { alert('РќРµР»СЊР·СЏ СЌРєРёРїРёСЂРѕРІР°С‚СЊ: РґСЂСѓРіРѕР№ РєР»Р°СЃСЃ'); return; }
+    if ((item.requiredLevel ?? 1) > player.progress.level) { alert(`РўСЂРµР±СѓРµС‚СЃСЏ СѓСЂ. ${item.requiredLevel}`); return; }
     const nextInv = player.inventory.filter(i => i !== item);
     const prev = (player.equipment as any)[slot] ?? null;
     const nextEquip = { ...player.equipment, [slot]: item } as any;
@@ -54,37 +54,37 @@ export default function Character({ player, onBack, onUpdatePlayer }: Props) {
 
   return (
     <div style={{padding:16, display:'grid', gap:12}}>
-      <Header title="Персонаж" gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} badgeTag={clanTag} />
+      <Header title="РџРµСЂСЃРѕРЅР°Р¶" gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} badgeTag={clanTag} />
       <PortraitCard
         img={cls.img}
         title={cls.title}
-        subtitle={`${cls.desc}. Ур. ${player.progress.level} • Энергия: ${player.energy}/${player.energyMax}${clanTag ? ` • Гильдия: ${clanTag}` : ''}`}
+        subtitle={`${cls.desc}. РЈСЂ. ${player.progress.level} вЂў Р­РЅРµСЂРіРёСЏ: ${player.energy}/${player.energyMax}${clanTag ? ` вЂў Р“РёР»СЊРґРёСЏ: ${clanTag}` : ''}`}
         size="lg"
       />
 
       <section style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)', boxShadow:'var(--shadow)', display:'grid', gap:10}}>
-        <b>Прогресс</b>
+        <b>РџСЂРѕРіСЂРµСЃСЃ</b>
         <StatBar label="XP" value={player.progress.xp} max={player.progress.xpToNext} />
         <div style={{display:'flex', gap:8, flexWrap:'wrap'}}>
-          <div>Сила: {estats.str}</div>
-          <div>Ловкость: {estats.agi}</div>
-          <div>Интеллект: {estats.int}</div>
-          <div>Выносливость: {estats.vit}</div>
+          <div>РЎРёР»Р°: {estats.str}</div>
+          <div>Р›РѕРІРєРѕСЃС‚СЊ: {estats.agi}</div>
+          <div>РРЅС‚РµР»Р»РµРєС‚: {estats.int}</div>
+          <div>Р’С‹РЅРѕСЃР»РёРІРѕСЃС‚СЊ: {estats.vit}</div>
         </div>
       </section>
 
       <section style={{display:'grid', gap:10, gridTemplateColumns:'1fr 1fr', alignItems:'start'}}>
         <div style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)', boxShadow:'var(--shadow)'}}>
-          <b>Экипировка</b>
-          <EquipRow label="Шлем" item={(player.equipment as any).helmet} onUnequip={() => unequip('helmet')} />
-          <EquipRow label="Верх" item={(player.equipment as any).chest}  onUnequip={() => unequip('chest')} />
-          <EquipRow label="Штаны" item={(player.equipment as any).pants}  onUnequip={() => unequip('pants')} />
-          <EquipRow label="Ботинки" item={(player.equipment as any).boots} onUnequip={() => unequip('boots')} />
-          <EquipRow label="Перчатки" item={(player.equipment as any).gloves} onUnequip={() => unequip('gloves')} />
+          <b>Р­РєРёРїРёСЂРѕРІРєР°</b>
+          <EquipRow label="РЁР»РµРј" item={(player.equipment as any).helmet} onUnequip={() => unequip('helmet')} />
+          <EquipRow label="Р’РµСЂС…" item={(player.equipment as any).chest}  onUnequip={() => unequip('chest')} />
+          <EquipRow label="РЁС‚Р°РЅС‹" item={(player.equipment as any).pants}  onUnequip={() => unequip('pants')} />
+          <EquipRow label="Р‘РѕС‚РёРЅРєРё" item={(player.equipment as any).boots} onUnequip={() => unequip('boots')} />
+          <EquipRow label="РџРµСЂС‡Р°С‚РєРё" item={(player.equipment as any).gloves} onUnequip={() => unequip('gloves')} />
         </div>
 
         <div style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)', boxShadow:'var(--shadow)', display:'grid', gap:8}}>
-          <b>Инвентарь</b>
+          <b>РРЅРІРµРЅС‚Р°СЂСЊ</b>
           <InventoryGrid items={player.inventory} onEquip={equip} />
         </div>
       </section>
@@ -97,7 +97,7 @@ function EquipRow({ label, item, onUnequip }: { label: string; item?: Item | nul
     <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', gap:10}}>
       <div style={{opacity:.9}}>{label}</div>
       <div style={{opacity:.9}}>
-        {item ? <span>{item.name}</span> : <span style={{opacity:.7}}>пусто</span>}
+        {item ? <span>{item.name}</span> : <span style={{opacity:.7}}>РїСѓСЃС‚Рѕ</span>}
       </div>
       <div>
         <button
@@ -106,10 +106,11 @@ function EquipRow({ label, item, onUnequip }: { label: string; item?: Item | nul
           className="mire-btn"
           style={{padding:'6px 10px', borderRadius:10}}
         >
-          снять
+          СЃРЅСЏС‚СЊ
         </button>
       </div>
     </div>
   );
 }
+
 
