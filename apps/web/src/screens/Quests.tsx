@@ -15,7 +15,7 @@ export default function Quests({ player, onBack, onUpdatePlayer }: Props) {
   const [state, setState] = useState<GameState>(() => loadGame());
   const defsById = useMemo(() => new Map(state.tasks.map(t => [t.id, t])), [state.tasks]);
   const active = useMemo(() => state.active.filter(a => a.kind === 'quest'), [state.active]);
-  const available = useMemo(() => state.tasks.filter(t => t.kind === 'quest' && ((t as any).requiredLevel ?? 1) <= player.progress.level), [state.tasks, player.progress.level]);
+  const available = useMemo(() => state.tasks.filter(t => t.kind === 'quest'), [state.tasks, player.progress.level]);
 
   useEffect(() => {
     const id = setInterval(() => {
