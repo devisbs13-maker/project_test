@@ -15,7 +15,7 @@ const ROLE_LABEL: Record<Member['role'], string> = {
   leader: 'Лидер',
   novice: 'Новичок',
   warden: 'Страж',
-  seer:   'Ведун',
+  seer:   'Ясновидец',
 };
 
 export default function Clan({ player, onBack }: Props) {
@@ -49,11 +49,11 @@ export default function Clan({ player, onBack }: Props) {
 
   return (
     <div style={{display:'grid', gap:12, padding:16}}>
-      <Header title={'Кланы'} gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} />
+      <Header title={'Клан'} gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} />
 
       {!me && (
         <section style={{display:'grid', gap:12, padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)'}}>
-          <div style={{fontWeight:700}}>Создать гильдию</div>
+          <div style={{fontWeight:700}}>Создать клан</div>
           <div style={{display:'grid', gap:8}}>
             <input placeholder="Название" value={name} onChange={e=>setName(e.target.value)} />
             <input placeholder="TAG (A-Z, 2-5)" value={tag} onChange={e=>setTag(e.target.value.toUpperCase())} />
@@ -61,19 +61,21 @@ export default function Clan({ player, onBack }: Props) {
               setErr(null); setLoading(true);
               try {
                 const res = await apiClanCreate(name, tag);
-                if (res.ok) { setMe(res.data); showToast('Гильдия создана'); refresh(); } else setErr(res.error);
+                if (res.ok) { setMe(res.data); showToast('Клан создан'); refresh(); }
+                else { setErr(res.error || 'Ошибка'); alert(res.error || 'Не удалось создать клан'); }
               } finally { setLoading(false); }
             }}>{player.progress.level < 5 ? 'Требуется 5 уровень' : 'Создать'}</Button>
           </div>
 
-          <div style={{marginTop:8, fontWeight:700}}>Вступить по тегу</div>
+          <div style={{marginTop:8, fontWeight:700}}>Вступить в клан</div>
           <div style={{display:'grid', gap:8}}>
             <input placeholder="TAG" value={joinTag} onChange={e=>setJoinTag(e.target.value.toUpperCase())} />
             <Button disabled={loading} onClick={async()=>{
               setErr(null); setLoading(true);
               try {
                 const res = await apiClanJoin(joinTag);
-                if (res.ok) { setMe(res.data); showToast('Вступили в гильдию'); refresh(); } else setErr(res.error);
+                if (res.ok) { setMe(res.data); showToast('Вы вступили в клан'); refresh(); }
+                else { setErr(res.error || 'Ошибка'); alert(res.error || 'Не удалось вступить'); }
               } finally { setLoading(false); }
             }}>Вступить</Button>
           </div>
@@ -85,9 +87,9 @@ export default function Clan({ player, onBack }: Props) {
       {me && (
         <section style={{display:'grid', gap:12, padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)'}}>
           <div style={{fontWeight:700}}>{me.name} [{me.tag}]</div>
-          <div>Казна: {me.bank}</div>
-          <div style={{opacity:.85}}>Бонус гильдии: +10% к опыту за квесты и работу</div>
-          <div style={{marginTop:8, fontWeight:700}}>Состав</div>
+          <div>Банк: {me.bank}</div>
+          <div style={{opacity:.85}}>Бонус к прогрессу: +10% за вклад клана</div>
+          <div style={{marginTop:8, fontWeight:700}}>Участники</div>
           <div style={{display:'grid', gap:6}}>
             {members.map(m => (
               <div key={m.userId} style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'8px 10px', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10}}>
@@ -100,7 +102,7 @@ export default function Clan({ player, onBack }: Props) {
                       <select onChange={async(e)=>{ const role=e.target.value as any; const r=await apiClanSetRole(m.userId, role); if(r.ok){ showToast('Роль обновлена'); refresh(); } }} defaultValue={m.role} style={{background:'var(--panel-bg)', color:'var(--text)'}}>
                         <option value="novice">Новичок</option>
                         <option value="warden">Страж</option>
-                        <option value="seer">Ведун</option>
+                        <option value="seer">Ясновидец</option>
                         <option value="leader">Лидер</option>
                       </select>
                       <Button onClick={async()=>{ const r = await apiClanKick(m.userId); if (r.ok) { showToast('Исключён'); refresh(); } }}>Выгнать</Button>
@@ -111,18 +113,18 @@ export default function Clan({ player, onBack }: Props) {
             ))}
           </div>
           <div style={{display:'flex', gap:8}}>
-            <input type="number" placeholder="Сумма взноса" value={amount} onChange={e=>setAmount(e.target.value)} />
+            <input type="number" placeholder="Сумма вклада" value={amount} onChange={e=>setAmount(e.target.value)} />
             <Button disabled={loading || !amount} onClick={async()=>{
               const n = Number(amount);
-              if (!Number.isFinite(n) || n<=0) { setErr('Сумма должна быть > 0'); return; }
+              if (!Number.isFinite(n) || n<=0) { setErr('Сумма должна быть > 0'); alert('Сумма должна быть больше 0'); return; }
               setErr(null); setLoading(true);
               try {
                 const res = await apiClanContribute(n);
-                if (res.ok) { setMe({ ...me, bank: res.data.bank }); setAmount(''); showToast('Взнос принят!'); }
-                else setErr(res.error);
+                if (res.ok) { setMe({ ...me, bank: res.data.bank }); setAmount(''); showToast('Вклад принят!'); }
+                else { setErr(res.error || 'Ошибка'); alert(res.error || 'Не удалось внести вклад'); }
               } finally { setLoading(false); }
-            }}>Взнос</Button>
-            <Button onClick={async()=>{ const r = await apiClanLeave(); if (r.ok) { showToast('Вы покинули гильдию'); setMe(null); setMembers([]); refresh(); } }}>Покинуть</Button>
+            }}>Внести</Button>
+            <Button onClick={async()=>{ const r = await apiClanLeave(); if (r.ok) { showToast('Вы покинули клан'); setMe(null); setMembers([]); refresh(); } }}>Покинуть</Button>
           </div>
           {err && <div style={{color:'#e77'}}>{err}</div>}
         </section>
@@ -130,3 +132,4 @@ export default function Clan({ player, onBack }: Props) {
     </div>
   );
 }
+
