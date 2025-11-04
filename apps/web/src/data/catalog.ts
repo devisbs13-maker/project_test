@@ -1,4 +1,4 @@
-import type { ItemDef } from '../store/economy';
+п»їimport type { ItemDef } from '../store/economy';
 
 const tiers = [
   { t:1, lvl:1,   rarity:'common'   as const, price:120 },
@@ -10,10 +10,10 @@ const tiers = [
 const slots = ['helmet','chest','pants','boots','gloves'] as const;
 
 function nameFor(cls: string, slot: string, tier: number): string {
-  const slotRu: Record<string,string> = { helmet:'Шлем', chest:'Верх', pants:'Штаны', boots:'Ботинки', gloves:'Перчатки' };
-  const tierRu = ['Новобранец','Ветеран','Элитный','Чемпион'];
-  const classRu: Record<string,string> = { warrior:'Воина', volkhv:'Волхва', hunter:'Охотника' };
-  return ${slotRu[slot]}  ;
+  const slotRu: Record<string,string> = { helmet:'РЁР»РµРј', chest:'Р’РµСЂС…', pants:'РЁС‚Р°РЅС‹', boots:'Р‘РѕС‚РёРЅРєРё', gloves:'РџРµСЂС‡Р°С‚РєРё' };
+  const tierRu = ['РќРѕРІРѕР±СЂР°РЅРµС†','Р’РµС‚РµСЂР°РЅ','Р­Р»РёС‚РЅС‹Р№','Р§РµРјРїРёРѕРЅ'];
+  const classRu: Record<string,string> = { warrior:'Р’РѕРёРЅР°', volkhv:'Р’РѕР»С…РІР°', hunter:'РћС…РѕС‚РЅРёРєР°' };
+  return `${slotRu[slot]} ${tierRu[tier-1]} ${classRu[cls]}`;
 }
 
 function makeSet(cls: 'warrior'|'volkhv'|'hunter'): ItemDef[] {
@@ -21,7 +21,7 @@ function makeSet(cls: 'warrior'|'volkhv'|'hunter'): ItemDef[] {
   for (const { t, lvl, rarity, price } of tiers) {
     for (const s of slots) {
       out.push({
-        id: ${cls}__t,
+        id: `${cls}_${s}_t${t}`,
         name: nameFor(cls, s, t),
         slot: s,
         rarity,
@@ -38,7 +38,6 @@ export const CATALOG: ItemDef[] = [
   ...makeSet('warrior'),
   ...makeSet('volkhv'),
   ...makeSet('hunter'),
-  { id:'herb', name:'Травы', slot:'misc', rarity:'common', basePrice:12 },
-  { id:'hide', name:'Шкура зверя', slot:'misc', rarity:'common', basePrice:28 },
+  { id:'herb', name:'РўСЂР°РІС‹', slot:'misc', rarity:'common', basePrice:12 },
+  { id:'hide', name:'РЁРєСѓСЂР° Р·РІРµСЂСЏ', slot:'misc', rarity:'common', basePrice:28 },
 ];
-
