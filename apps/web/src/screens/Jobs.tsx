@@ -107,6 +107,11 @@ export default function Jobs({ player, onBack, onUpdatePlayer }: Props) {
                 <div>
                   <div style={{fontWeight:700}}>{def.title}</div>
                   <div style={{opacity:.85, fontSize:12}}>{def.desc}</div>
+                  {player.progress.level < ((def as any).requiredLevel ?? 1) && (
+                    <div style={{opacity:.85, fontSize:12, marginTop:4, color:'#e7a'}}>
+                      Требуется ур. {((def as any).requiredLevel ?? 1)}
+                    </div>
+                  )}
                   <div style={{opacity:.85, fontSize:12, marginTop:4}}>Длительность: {def.durationSec/60} мин • Цена: ⚡ {def.costEnergy ?? 0} • Выплата: 🪙 {def.reward.gold ?? 0} • XP {def.reward.xp ?? 0}</div>
                 </div>
                 <Button disabled={cant} onClick={() => start(def)}>{running ? 'Выполняется' : 'Начать'}</Button>
