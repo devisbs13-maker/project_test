@@ -9,6 +9,7 @@ export type TaskDef = {
   durationSec: number;
   costEnergy?: number;
   reward: Reward;
+  requiredLevel?: number;
 };
 
 export type ActiveTask = {
@@ -40,6 +41,25 @@ export type GameState = {
 
 const STORAGE_KEY = 'mirevald:game';
 
+function generateTieredTasks(maxLevel = 100): TaskDef[] {
+  const out: TaskDef[] = [];
+  const levels: number[] = [1];
+  for (let l = 5; l <= maxLevel; l += 5) levels.push(l);
+  levels.forEach((lvl, i) => {
+    const tier = i + 1;
+    const qDur = 60 * (3 + Math.min(10, Math.floor(tier * 0.75)));
+    const jDur = 60 * (5 + Math.min(20, Math.floor(tier)));
+    const qCost = 2 + Math.floor(tier / 5);
+    const jCost = 2 + Math.floor(tier / 4);
+    const qXp = 15 + Math.round(lvl * 2);
+    const jXp = 10 + Math.round(lvl * 1.2);
+    const gold = 40 + lvl * 6;
+    out.push({ id:`q-${lvl}`, kind:'quest', title:`Задание уровня ${lvl}`, desc:`Испытание для героев ур. ≥ ${lvl}`, durationSec:qDur, costEnergy:qCost, reward:{ xp:qXp, gold:Math.round(gold*0.5) }, requiredLevel:lvl });
+    out.push({ id:`j-${lvl}`, kind:'job',   title:`Работа уровня ${lvl}`,  desc:`Подходит для ур. ≥ ${lvl}`,       durationSec:jDur, costEnergy:jCost, reward:{ gold:Math.round(gold), xp:jXp },        requiredLevel:lvl });
+  });
+  return out;
+}
+
 export function defaultTasks(): TaskDef[] {
   return [
     // Quests
@@ -55,16 +75,16 @@ export function defaultTasks(): TaskDef[] {
 export function loadGame(): GameState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { tasks: defaultTasks(), active: [], vault: [], limits: { quest: 1, job: 2 } };
+    if (!raw) return { tasks: generateTieredTasks(100), active: [], vault: [], limits: { quest: 1, job: 2 } };
     const parsed = JSON.parse(raw);
     return {
-      tasks: Array.isArray(parsed.tasks) ? parsed.tasks : defaultTasks(),
+      tasks: generateTieredTasks(100),
       active: Array.isArray(parsed.active) ? parsed.active : [],
       vault: Array.isArray(parsed.vault) ? parsed.vault : [],
       limits: parsed.limits ?? { quest: 1, job: 2 },
     };
   } catch {
-    return { tasks: defaultTasks(), active: [], vault: [], limits: { quest: 1, job: 2 } };
+    return { tasks: generateTieredTasks(100), active: [], vault: [], limits: { quest: 1, job: 2 } };
   }
 }
 

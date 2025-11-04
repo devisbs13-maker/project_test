@@ -42,6 +42,7 @@ const LEGACY_KEY = 'mirevald.player';
 
 export const ENERGY_REGEN_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 export const ENERGY_REGEN_AMOUNT = 1;
+export const MAX_LEVEL = 100;
 
 export function tickEnergy(p: Player, now: number = Date.now()): Player {
   const next = { ...p } as Player;
@@ -86,9 +87,9 @@ export function normalizePlayer(raw: any): Player {
     lastEnergyTs: raw.lastEnergyTs ?? Date.now(),
     stats: baseStats,
     progress: {
-      level,
+      level: Math.min(level, MAX_LEVEL),
       xp,
-      xpToNext: raw.progress?.xpToNext ?? xpCurve(level),
+      xpToNext: raw.progress?.xpToNext ?? (level >= MAX_LEVEL ? 0 : xpCurve(level)),
     },
     inventory: Array.isArray(raw.inventory) ? raw.inventory : [],
     equipment: {
@@ -126,7 +127,8 @@ export function baseStatsFor(classId: ClassId): Stats {
 }
 
 export function xpCurve(level: number): number {
-  return Math.round(50 * Math.pow(level, 1.4));
+  // Linear-ish curve tuned for ~30 days to cap
+  return Math.max(10, Math.round(30 + 5 * level));
 }
 
 export function seedStarterItems(classId: ClassId): Item[] {
@@ -162,10 +164,21 @@ export function createPlayer(classId: ClassId, name = 'Герой'): Player {
 export function addXp(p: Player, amount: number): Player {
   let { level, xp, xpToNext } = p.progress;
   xp += amount;
-  while (xp >= xpToNext) {
+  while (xpToNext > 0 && xp >= xpToNext) {
     xp -= xpToNext;
+    if (level >= MAX_LEVEL) {
+      level = MAX_LEVEL;
+      xp = 0;
+      xpToNext = 0;
+      break;
+    }
     level += 1;
-    xpToNext = xpCurve(level);
+    if (level >= MAX_LEVEL) {
+      xpToNext = 0;
+      xp = 0;
+    } else {
+      xpToNext = xpCurve(level);
+    }
     p.stats.vit += 1;
     if (p.classId === 'warrior') p.stats.str += 1;
     if (p.classId === 'volkhv')  p.stats.int += 1;
@@ -175,7 +188,7 @@ export function addXp(p: Player, amount: number): Player {
 }
 
 export function canLevelUp(p: Player): boolean {
-  return p.progress.xp >= p.progress.xpToNext;
+  return p.progress.xpToNext > 0 && p.progress.xp >= p.progress.xpToNext;
 }
 
 export function levelUp(p: Player): Player {

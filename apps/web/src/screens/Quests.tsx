@@ -15,7 +15,7 @@ export default function Quests({ player, onBack, onUpdatePlayer }: Props) {
   const [state, setState] = useState<GameState>(() => loadGame());
   const defsById = useMemo(() => new Map(state.tasks.map(t => [t.id, t])), [state.tasks]);
   const active = useMemo(() => state.active.filter(a => a.kind === 'quest'), [state.active]);
-  const available = useMemo(() => state.tasks.filter(t => t.kind === 'quest'), [state.tasks]);
+  const available = useMemo(() => state.tasks.filter(t => t.kind === 'quest' && ((t as any).requiredLevel ?? 1) <= player.progress.level), [state.tasks, player.progress.level]);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -99,9 +99,9 @@ export default function Quests({ player, onBack, onUpdatePlayer }: Props) {
       <section style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)'}}>
         <b>Доступные квесты</b>
         <div style={{display:'grid', gap:8, marginTop:8}}>
-          {available.filter(t=>t.kind==='quest').map(def => {
+          {available.map(def => {
             const running = !!active.find(a => a.id === def.id);
-            const cant = (def.costEnergy ?? 0) > player.energy || running;
+            const cant = (def.costEnergy ?? 0) > player.energy || running || (player.progress.level < ((def as any).requiredLevel ?? 1));
             return (
               <div key={def.id} style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 12px', borderRadius:12, background:'var(--panel-bg)', border:'1px solid rgba(255,255,255,0.08)'}}>
                 <div>
