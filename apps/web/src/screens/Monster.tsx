@@ -3,7 +3,7 @@ import Header from '../components/Header';
 import Button from '../components/Button';
 import type { Player } from '../store/player';
 import { effectiveStats, savePlayer } from '../store/player';
-import { loadBattle, saveBattle, startBattle, isBattleActive, type BattleState } from '../store/battle';
+import { loadBattle, saveBattle, startBattle, isBattleActive, type BattleState, MONSTERS, startBattleWith } from '../store/battle';
 import { loadGame } from '../store/game';
 import { remainingMs } from '../utils/time';
 import { notifyAll, showToast } from '../utils/notify';
@@ -39,7 +39,8 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
   function begin() {
     if (active) return;
     try { const g = loadGame(); if ((g.active||[]).length > 0) { alert('Сначала завершите текущие задания/работы.'); return; } } catch {}
-    const b = startBattle(player);
+    const pick = MONSTERS[Math.floor(Math.random() * MONSTERS.length)];
+    const b = startBattleWith(player, pick);
     setBattle(b);
   }
 
@@ -59,9 +60,10 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
       const level = player.progress.level;
       const margin = power - diff;
       const mult = Math.max(0.7, Math.min(1.5, 1 + (margin / 120))); // -120..+120 -> ~0.0..+1.0
+      const rMul = (battle as any).rewardMul ?? 1.0;
       const jitter = 0.9 + Math.random() * 0.2;
-      const gold = Math.max(5, Math.round((30 + level * 6) * mult * jitter));
-      const xp = Math.max(5, Math.round((18 + level * 3) * mult * jitter));
+      const gold = Math.max(5, Math.round((30 + level * 6) * mult * rMul * jitter));
+      const xp = Math.max(5, Math.round((18 + level * 3) * mult * rMul * jitter));
 
       // Apply gold/xp
       const p1 = grantReward(player, { gold, xp });
