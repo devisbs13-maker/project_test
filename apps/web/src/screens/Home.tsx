@@ -40,7 +40,7 @@ export default function Home({ player, onOpenQuests, onOpenJobs, onOpenArena, on
       <section className={`${s.panel} ${s.panelGlow} ${s.appear}`}>
         <PortraitCard
           img={cls.img}
-          title={cls.title}
+          title={`${player.name ? `👤 ${player.name} • ` : ''}${cls.title}`}
           subtitle={`${cls.desc}. ${RU.stats.level} ${player.progress.level} • ${RU.stats.energy}: ${player.energy}/${player.energyMax}`}
           size="md"
           rightSlot={
@@ -61,6 +61,16 @@ export default function Home({ player, onOpenQuests, onOpenJobs, onOpenArena, on
           <Button className={s.btnFull} onClick={() => setScreen?.('leaderboard')}>Таблица лидеров</Button>
           <Button className={s.btnFull} onClick={onOpenArena}>{RU.buttons.arena}</Button>
           <Button className={s.btnFull} onClick={onOpenGuild}>{RU.buttons.guild}</Button>
+        </div>
+      </section>
+      <section className={`${s.panel} ${s.appear}`}>
+        <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+          <span style={{opacity:.7, fontSize:12}}>Ник берётся из Telegram WebApp</span>
+          <button
+            onClick={() => { try { localStorage.removeItem('mirevald:player'); localStorage.removeItem('mirevald:session'); localStorage.removeItem('mirevald:clan'); } catch {}; location.reload(); }}
+            style={{background:'transparent', border:'none', color:'var(--gold)', cursor:'pointer', fontSize:12, textDecoration:'underline'}}
+            aria-label="reset-profile"
+          >Сбросить персонажа</button>
         </div>
       </section>
     </div>
