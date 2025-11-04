@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import Header from '../components/Header';
 import Button from '../components/Button';
 import type { Player } from '../store/player';
@@ -38,9 +38,16 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
 
   function begin() {
     if (active) return;
-    try { const g = loadGame(); if ((g.active||[]).length > 0) { alert('Сначала завершите текущие задания/работы.'); return; } } catch {}
+    try { const g = loadGame(); if ((g.active||[]).length > 0) { alert('РЎРЅР°С‡Р°Р»Р° Р·Р°РІРµСЂС€РёС‚Рµ С‚РµРєСѓС‰РёРµ Р·Р°РґР°РЅРёСЏ/СЂР°Р±РѕС‚С‹.'); return; } } catch {}
     const pick = MONSTERS[Math.floor(Math.random() * MONSTERS.length)];
     const b = startBattleWith(player, pick);
+    setBattle(b);
+  }
+
+  function fight(m: any) {
+    if (active) return;
+    try { const g = loadGame(); if ((g.active||[]).length > 0) { alert('РЎРЅР°С‡Р°Р»Р° Р·Р°РІРµСЂС€РёС‚Рµ С‚РµРєСѓС‰РёРµ Р·Р°РґР°РЅРёСЏ/СЂР°Р±РѕС‚С‹.'); return; } } catch {}
+    const b = startBattleWith(player, m);
     setBattle(b);
   }
 
@@ -86,25 +93,44 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
         }
       }
 
-      notifyAll('quest', 'Победа над монстром', { gold, xp });
-      try { showToast('Победа над монстром! Награда получена.'); } catch {}
+      notifyAll('quest', 'РџРѕР±РµРґР° РЅР°Рґ РјРѕРЅСЃС‚СЂРѕРј', { gold, xp });
+      try { showToast('РџРѕР±РµРґР° РЅР°Рґ РјРѕРЅСЃС‚СЂРѕРј! РќР°РіСЂР°РґР° РїРѕР»СѓС‡РµРЅР°.'); } catch {}
       savePlayer(pFinal);
       onUpdatePlayer(pFinal);
     } else {
-      try { showToast('Поражение. Монстр оказался сильнее.'); } catch {}
+      try { showToast('РџРѕСЂР°Р¶РµРЅРёРµ. РњРѕРЅСЃС‚СЂ РѕРєР°Р·Р°Р»СЃСЏ СЃРёР»СЊРЅРµРµ.'); } catch {}
     }
   }
 
   return (
     <div style={{display:'grid', gap:12, padding:16}}>
-      <Header title="Бой с монстром" gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} />
+      <Header title="Р‘РѕР№ СЃ РјРѕРЅСЃС‚СЂРѕРј" gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} />
 
       {!active && (
         <section style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)'}}>
           <div style={{display:'grid', gap:8}}>
-            <div>Вы можете отправиться на бой с монстром. Бой длится 30 минут. Пока бой идет, нельзя выполнять задания и работать.</div>
-            <div style={{opacity:.85, fontSize:12}}>Текущая мощь: {power}</div>
-            <Button onClick={begin}>Сразиться (30 минут)</Button>
+            <div>Р’С‹ РјРѕР¶РµС‚Рµ РѕС‚РїСЂР°РІРёС‚СЊСЃСЏ РЅР° Р±РѕР№ СЃ РјРѕРЅСЃС‚СЂРѕРј. Р‘РѕР№ РґР»РёС‚СЃСЏ 30 РјРёРЅСѓС‚. РџРѕРєР° Р±РѕР№ РёРґРµС‚, РЅРµР»СЊР·СЏ РІС‹РїРѕР»РЅСЏС‚СЊ Р·Р°РґР°РЅРёСЏ Рё СЂР°Р±РѕС‚Р°С‚СЊ.</div>
+            <div style={{opacity:.85, fontSize:12}}>РўРµРєСѓС‰Р°СЏ РјРѕС‰СЊ: {power}</div>
+            <div style={{display:'grid', gap:8, marginTop:8}}>
+              {MONSTERS.map((m) => {
+                const level = player.progress.level;
+                const difficulty = Math.round((40 + level * 8) * m.diffMul);
+                const base = 0.5 + (power - difficulty) / 100;
+                const chance = Math.max(0.05, Math.min(0.95, base));
+                return (
+                  <div key={m.id} style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'8px 12px', borderRadius:12, background:'var(--panel-bg)', border:'1px solid rgba(255,255,255,0.08)'}}>
+                    <div style={{display:'flex', alignItems:'center', gap:10}}>
+                      {m.image ? <img src={m.image} alt={m.name} style={{width:40,height:40,objectFit:'cover',borderRadius:8}} /> : <div style={{width:40,height:40,borderRadius:8,background:'rgba(255,255,255,0.07)'}} />} 
+                      <div>
+                        <div style={{fontWeight:700}}>{m.name}</div>
+                        <div style={{opacity:.85, fontSize:12}}>Сложность: {difficulty} • Шанс победы: {Math.round(chance*100)}% • Награда x{m.rewardMul}</div>
+                      </div>
+                    </div>
+                    <Button onClick={() => fight(m)}>Сразиться</Button>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </section>
       )}
@@ -113,9 +139,9 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
         <section style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)'}}>
           <div style={{display:'grid', gap:8}}>
             <div style={{fontWeight:700}}>{battle.monster}</div>
-            <div style={{opacity:.85}}>Идет бой… Осталось: {fmt(msLeft)}</div>
-            <div style={{opacity:.85, fontSize:12}}>Мощь: {power} • Сложность: {battle.difficulty}</div>
-            <Button disabled={remainingMs(battle.endsAt) > 0} onClick={resolve}>Завершить бой</Button>
+            <div style={{opacity:.85}}>РРґРµС‚ Р±РѕР№вЂ¦ РћСЃС‚Р°Р»РѕСЃСЊ: {fmt(msLeft)}</div>
+            <div style={{opacity:.85, fontSize:12}}>РњРѕС‰СЊ: {power} вЂў РЎР»РѕР¶РЅРѕСЃС‚СЊ: {battle.difficulty}</div>
+            <Button disabled={remainingMs(battle.endsAt) > 0} onClick={resolve}>Р—Р°РІРµСЂС€РёС‚СЊ Р±РѕР№</Button>
           </div>
         </section>
       )}

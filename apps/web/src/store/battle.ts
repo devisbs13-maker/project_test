@@ -6,6 +6,7 @@ export type MonsterDef = {
   name: string;
   diffMul: number;   // multiplier to base difficulty
   rewardMul: number; // reward multiplier
+  image?: string;    // optional image url
 };
 
 export const MONSTERS: MonsterDef[] = [
