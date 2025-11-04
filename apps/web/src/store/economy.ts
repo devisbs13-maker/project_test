@@ -4,7 +4,7 @@ export type Side = 'buy'|'sell';
 export type ItemDef = {
   id: string;
   name: string;
-  slot: 'weapon'|'armor'|'amulet'|'misc';
+  slot: 'helmet'|'chest'|'pants'|'boots'|'gloves'|'misc';
   rarity: Rarity;
   basePrice: number;      // for BUY baseline
   sellBase?: number;      // optional baseline for SELL (otherwise basePrice*0.45)
@@ -33,4 +33,5 @@ export function loadEconomy(): MerchantState|null {
     return s ? JSON.parse(s) as MerchantState : null;
   } catch { return null; }
 }
+
 
