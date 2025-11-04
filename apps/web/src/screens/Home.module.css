@@ -96,7 +96,7 @@
 }
 
 /* Hide obsolete leaderboard button (5th in the list) */
-.buttonList > button:nth-child(5) {
+.buttonList > button:nth-child(4) {
   display: none !important;
 }
 
