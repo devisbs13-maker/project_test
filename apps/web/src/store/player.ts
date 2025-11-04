@@ -79,7 +79,7 @@ export function normalizePlayer(raw: any): Player {
     int: raw.stats?.int ?? 5,
     vit: raw.stats?.vit ?? 5,
   };
-  const p: Player = {
+  let p: Player = {
     name:    raw.name ?? 'Герой',
     classId: raw.classId ?? 'warrior',
     gold:    raw.gold ?? 0,
@@ -105,6 +105,21 @@ export function normalizePlayer(raw: any): Player {
       gloves: (raw.equipment?.gloves ?? null) as any,
     },
   };
+  // Migration: if player has no new-slot items/equipment, seed starter set
+  try {
+    const hasAnyNewSlot = Array.isArray(p.inventory) && p.inventory.some(it => (
+      it && (it.slot === 'helmet' || it.slot === 'chest' || it.slot === 'pants' || it.slot === 'boots' || it.slot === 'gloves')
+    ));
+    const hasAnyEquipped = !!(p.equipment.helmet || p.equipment.chest || p.equipment.pants || p.equipment.boots || p.equipment.gloves);
+    if (!hasAnyNewSlot && !hasAnyEquipped) {
+      const starter = seedStarterItems(p.classId);
+      // avoid duplicates by id
+      const existingIds = new Set((p.inventory || []).map(it => it.id));
+      const merged = [...p.inventory];
+      for (const it of starter) if (!existingIds.has(it.id)) merged.push(it);
+      p = { ...p, inventory: merged };
+    }
+  } catch {}
   return p;
 }
 

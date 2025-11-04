@@ -31,7 +31,14 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
   });
 
   const defsById = useMemo(() => new Map(CATALOG.map(d => [d.id, d])), []);
-
+  try {
+    const known = eco.offers.filter(o => defsById.has(o.itemId));
+    if (eco.offers.length > 0 && known.length === 0) {
+      const regen = generateDailyInventory(player);
+      saveEconomy(regen);
+      setEco(regen);
+    }
+  } catch {}
   function buy(itemId: string) {
     const offIdx = eco.offers.findIndex(o => o.itemId === itemId);
     if (offIdx === -1) return;
@@ -121,5 +128,7 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
     </div>
   );
 }
+
+
 
 
