@@ -15,7 +15,7 @@ export default function Jobs({ player, onBack, onUpdatePlayer }: Props) {
   const [state, setState] = useState<GameState>(() => loadGame());
   const defsById = useMemo(() => new Map(state.tasks.map(t => [t.id, t])), [state.tasks]);
   const active = useMemo(() => state.active.filter(a => a.kind === 'job'), [state.active]);
-  const available = useMemo(() => state.tasks.filter(t => t.kind === 'job' && ((t as any).requiredLevel ?? 1) <= player.progress.level), [state.tasks, player.progress.level]);
+  const available = useMemo(() => state.tasks.filter(t => t.kind === 'job'), [state.tasks, player.progress.level]);
 
   useEffect(() => {
     const id = setInterval(() => {
