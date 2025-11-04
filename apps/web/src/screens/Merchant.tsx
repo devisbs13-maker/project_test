@@ -98,7 +98,7 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
 
   return (
     <div style={{display:'grid', gap:12, padding:16}}>
-      <Header title="РўРѕСЂРіРѕРІРµС†" gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} />
+      <Header title="Торговец" gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} />
 
       <div style={{display:'flex', gap:8}}>
         <Button onClick={()=>setTab('buy')} disabled={tab==='buy'}>РљСѓРїРёС‚СЊ</Button>
@@ -108,8 +108,8 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
       {tab==='buy' && (
         <section style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)'}}>
           <div style={{display:'flex', gap:8, marginBottom:8}}>
-            <Button onClick={()=>setCategory('resources')} disabled={category==='resources'}>Р РµСЃСѓСЂСЃС‹</Button>
-            <Button onClick={()=>setCategory('clothing')} disabled={category==='clothing'}>РћРґРµР¶РґР°</Button>
+            <Button onClick={()=>setCategory('resources')} disabled={category==='resources'}>Ресурсы</Button>
+            <Button onClick={()=>setCategory('clothing')} disabled={category==='clothing'}>Одежда</Button>
           </div>
 
           {category==='resources' && (
@@ -211,6 +211,7 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
     </div>
   );
 }
+
 
 
 

@@ -95,10 +95,7 @@
   gap: 10px;
 }
 
-/* Hide obsolete leaderboard button (5th in the list) */
-.buttonList > button:nth-child(4) {
-  display: none !important;
-}
+
 
 .btnFull {
   width: 100%;
