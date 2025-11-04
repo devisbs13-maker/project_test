@@ -16,6 +16,7 @@ import type { Player } from './store/player';
 import { loadPlayer, savePlayer, tickEnergy, createPlayer } from './store/player';
 import { ensureDevSession } from './store/session';
 import { apiVerifyAuth } from './utils/api';
+import { getTelegramUser } from './utils/telegram';
 
 function usePlayerState() {
   const [player, setPlayer] = useState<Player | null>(null);
@@ -80,6 +81,17 @@ export default function App() {
         if (session && p) {
           if (p.name !== session.name) {
             updatePlayer({ ...p, name: session.name });
+          }
+        }
+      } catch {}
+
+      // Fallback: if API is unreachable but WebApp is present, use client-side TG user for display name
+      try {
+        const u = getTelegramUser();
+        if (u && p) {
+          const display = (u.username ? `@${u.username}` : [u.first_name, u.last_name].filter(Boolean).join(' ')) || p.name;
+          if (display && display !== p.name) {
+            updatePlayer({ ...p, name: display });
           }
         }
       } catch {}
