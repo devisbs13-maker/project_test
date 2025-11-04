@@ -1,7 +1,8 @@
 export type ClassId = 'warrior' | 'volkhv' | 'hunter';
 
 export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic';
-export type ItemSlot = 'weapon' | 'armor' | 'amulet' | 'misc';
+// Expanded equipment slots for armor sets
+export type ItemSlot = 'helmet' | 'chest' | 'pants' | 'boots' | 'gloves' | 'misc';
 
 export interface Item {
   id: string;
@@ -9,12 +10,16 @@ export interface Item {
   slot: ItemSlot;
   rarity: Rarity;
   bonus?: Partial<Record<'str'|'agi'|'int'|'vit', number>>;
+  requiredLevel?: number;
+  classReq?: ClassId; // if set, only this class can equip
 }
 
 export interface Equipment {
-  weapon?: Item | null;
-  armor?: Item | null;
-  amulet?: Item | null;
+  helmet?: Item | null;
+  chest?: Item | null;
+  pants?: Item | null;
+  boots?: Item | null;
+  gloves?: Item | null;
 }
 
 export interface Stats { str: number; agi: number; int: number; vit: number; }
@@ -93,9 +98,11 @@ export function normalizePlayer(raw: any): Player {
     },
     inventory: Array.isArray(raw.inventory) ? raw.inventory : [],
     equipment: {
-      weapon: raw.equipment?.weapon ?? null,
-      armor:  raw.equipment?.armor  ?? null,
-      amulet: raw.equipment?.amulet ?? null,
+      helmet: (raw.equipment?.helmet ?? null) as any,
+      chest:  (raw.equipment?.chest  ?? null) as any,
+      pants:  (raw.equipment?.pants  ?? null) as any,
+      boots:  (raw.equipment?.boots  ?? null) as any,
+      gloves: (raw.equipment?.gloves ?? null) as any,
     },
   };
   return p;
@@ -132,20 +139,30 @@ export function xpCurve(level: number): number {
 }
 
 export function seedStarterItems(classId: ClassId): Item[] {
+  // Starter set (tier 1) per class
+  const tier = 1;
+  const req = 1;
+  const mk = (slot: ItemSlot, name: string, bonus: Item['bonus']): Item => ({ id:`${classId}_${slot}_t${tier}`, name, slot, rarity:'common', bonus, requiredLevel:req, classReq: classId });
   if (classId === 'warrior') return [
-    { id:'sword1', name:'Rusty Sword', slot:'weapon', rarity:'common', bonus:{ str:1 } },
-    { id:'coat1',  name:'Worn Coat',   slot:'armor',  rarity:'common', bonus:{ vit:1 } },
-    { id:'charm1', name:'Old Charm',   slot:'amulet', rarity:'uncommon', bonus:{ vit:1 } },
+    mk('helmet','Шлем новобранца', { vit:1 }),
+    mk('chest','Кираса новобранца', { str:1 }),
+    mk('pants','Набедренники новобранца', { vit:1 }),
+    mk('boots','Сапоги новобранца', { vit:1 }),
+    mk('gloves','Перчатки новобранца', { str:1 }),
   ];
   if (classId === 'volkhv') return [
-    { id:'staff1', name:'Wooden Staff', slot:'weapon', rarity:'common', bonus:{ int:1 } },
-    { id:'robe1',  name:'Simple Robe',  slot:'armor',  rarity:'common', bonus:{ vit:1 } },
-    { id:'rune1',  name:'Small Rune',   slot:'amulet', rarity:'uncommon', bonus:{ int:1 } },
+    mk('helmet','Капюшон ученика', { int:1 }),
+    mk('chest','Одеяние ученика', { int:1 }),
+    mk('pants','Штаны ученика', { vit:1 }),
+    mk('boots','Башмаки ученика', { vit:1 }),
+    mk('gloves','Перчатки ученика', { int:1 }),
   ];
   return [
-    { id:'bow1',   name:'Old Bow',     slot:'weapon', rarity:'common', bonus:{ agi:1 } },
-    { id:'vest1',  name:'Leather Vest',slot:'armor',  rarity:'common', bonus:{ vit:1 } },
-    { id:'tooth1', name:'Wolf Tooth',  slot:'amulet', rarity:'uncommon', bonus:{ agi:1 } },
+    mk('helmet','Капюшон следопыта', { agi:1 }),
+    mk('chest','Жилет следопыта', { agi:1 }),
+    mk('pants','Штаны следопыта', { vit:1 }),
+    mk('boots','Сапоги следопыта', { vit:1 }),
+    mk('gloves','Перчатки следопыта', { agi:1 }),
   ];
 }
 
@@ -212,8 +229,10 @@ export function effectiveStats(p: Player): Stats {
     if (it.bonus.int) sum.int += it.bonus.int;
     if (it.bonus.vit) sum.vit += it.bonus.vit;
   };
-  apply(eq.weapon ?? null);
-  apply(eq.armor ?? null);
-  apply(eq.amulet ?? null);
+  apply(eq.helmet ?? null);
+  apply(eq.chest ?? null);
+  apply(eq.pants ?? null);
+  apply(eq.boots ?? null);
+  apply(eq.gloves ?? null);
   return sum;
 }

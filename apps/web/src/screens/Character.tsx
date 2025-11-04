@@ -3,7 +3,7 @@ import PortraitCard from '../components/PortraitCard';
 import StatBar from '../components/StatBar';
 import InventoryGrid from '../components/InventoryGrid';
 import { CLASS_ASSETS } from '../assets/classes';
-import type { Player, Item } from '../store/player';
+import type { Player, Item, ItemSlot } from '../store/player';
 import { effectiveStats } from '../store/player';
 import { useEffect, useState } from 'react';
 
@@ -30,23 +30,25 @@ export default function Character({ player, onBack, onUpdatePlayer }: Props) {
   }, []);
 
   function equip(item: Item) {
-    const slot = item.slot;
-    const nextInv = player.inventory.filter(i => i.id !== item.id);
-    const prev = player.equipment[slot] ?? null;
-    const nextEquip = { ...player.equipment, [slot]: item };
+    const slot = item.slot as ItemSlot;
+    if (item.classReq && item.classReq !== player.classId) { alert('Нельзя экипировать: другой класс'); return; }
+    if ((item.requiredLevel ?? 1) > player.progress.level) { alert(`Требуется ур. ${item.requiredLevel}`); return; }
+    const nextInv = player.inventory.filter(i => i !== item);
+    const prev = (player.equipment as any)[slot] ?? null;
+    const nextEquip = { ...player.equipment, [slot]: item } as any;
     const back = prev ? [...nextInv, prev] : nextInv;
     const next = { ...player, equipment: nextEquip, inventory: back };
     onUpdatePlayer(next);
   }
 
-  function unequip(slot: 'weapon'|'armor'|'amulet') {
-    const cur = player.equipment[slot] ?? null;
+  function unequip(slot: ItemSlot) {
+    const cur = (player.equipment as any)[slot] ?? null;
     if (!cur) return;
     const next = {
       ...player,
-      equipment: { ...player.equipment, [slot]: null },
+      equipment: { ...(player.equipment as any), [slot]: null } as any,
       inventory: [...player.inventory, cur]
-    };
+    } as Player;
     onUpdatePlayer(next);
   }
 
@@ -61,12 +63,12 @@ export default function Character({ player, onBack, onUpdatePlayer }: Props) {
       />
 
       <section style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)', boxShadow:'var(--shadow)', display:'grid', gap:10}}>
-        <b>Характеристики</b>
+        <b>Прогресс</b>
         <StatBar label="XP" value={player.progress.xp} max={player.progress.xpToNext} />
         <div style={{display:'flex', gap:8, flexWrap:'wrap'}}>
           <div>Сила: {estats.str}</div>
           <div>Ловкость: {estats.agi}</div>
-          <div>Мудрость: {estats.int}</div>
+          <div>Интеллект: {estats.int}</div>
           <div>Выносливость: {estats.vit}</div>
         </div>
       </section>
@@ -74,9 +76,11 @@ export default function Character({ player, onBack, onUpdatePlayer }: Props) {
       <section style={{display:'grid', gap:10, gridTemplateColumns:'1fr 1fr', alignItems:'start'}}>
         <div style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)', boxShadow:'var(--shadow)'}}>
           <b>Экипировка</b>
-          <EquipRow label="Оружие" item={player.equipment.weapon} onUnequip={() => unequip('weapon')} />
-          <EquipRow label="Броня" item={player.equipment.armor}  onUnequip={() => unequip('armor')} />
-          <EquipRow label="Амулет" item={player.equipment.amulet} onUnequip={() => unequip('amulet')} />
+          <EquipRow label="Шлем" item={(player.equipment as any).helmet} onUnequip={() => unequip('helmet')} />
+          <EquipRow label="Верх" item={(player.equipment as any).chest}  onUnequip={() => unequip('chest')} />
+          <EquipRow label="Штаны" item={(player.equipment as any).pants}  onUnequip={() => unequip('pants')} />
+          <EquipRow label="Ботинки" item={(player.equipment as any).boots} onUnequip={() => unequip('boots')} />
+          <EquipRow label="Перчатки" item={(player.equipment as any).gloves} onUnequip={() => unequip('gloves')} />
         </div>
 
         <div style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)', boxShadow:'var(--shadow)', display:'grid', gap:8}}>
@@ -102,7 +106,7 @@ function EquipRow({ label, item, onUnequip }: { label: string; item?: Item | nul
           className="mire-btn"
           style={{padding:'6px 10px', borderRadius:10}}
         >
-          Снять
+          снять
         </button>
       </div>
     </div>
