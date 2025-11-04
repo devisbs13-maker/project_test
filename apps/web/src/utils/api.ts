@@ -59,10 +59,24 @@ export async function fetchLeaderboard(kind: 'weekly'|'alltime', limit = 20) {
   return res.json();
 }
 
+// Helper to parse JSON and normalize errors
+async function jsonOrError<T>(res: Response): Promise<T> {
+  try {
+    const data = await res.json();
+    if (!res.ok) {
+      const err = (data as any)?.error || `HTTP ${res.status}`;
+      return { ok: false, error: err } as any;
+    }
+    return data as T;
+  } catch {
+    return { ok: false, error: 'network' } as any;
+  }
+}
+
 // Clans v1 API (header-based user)
 export async function apiClanMe(): Promise<ClanMeResponse> {
   const res = await fetch(`${API_BASE}/clan/me`, withUserHeaders());
-  const data = await res.json();
+  const data = await jsonOrError<ClanMeResponse>(res);
   try {
     if (data?.ok && data?.data) localStorage.setItem('mirevald:clan', JSON.stringify(data.data));
     else localStorage.removeItem('mirevald:clan');
@@ -73,41 +87,41 @@ export async function apiClanMe(): Promise<ClanMeResponse> {
 export async function apiClanCreate(name: string, tag: string): Promise<ClanCreateResponse> {
   const body: ClanCreateRequest = { name, tag };
   const res = await fetch(`${API_BASE}/clan/create`, withUserHeaders({ method: 'POST', body: JSON.stringify(body) }));
-  return res.json();
+  return jsonOrError<ClanCreateResponse>(res);
 }
 
 export async function apiClanJoin(idOrTag: string): Promise<ClanJoinResponse> {
   // Accept either clanId or tag; send both for compatibility
   const body: any = { clanId: idOrTag, tag: idOrTag } as ClanJoinRequest & { clanId?: string };
   const res = await fetch(`${API_BASE}/clan/join`, withUserHeaders({ method: 'POST', body: JSON.stringify(body) }));
-  return res.json();
+  return jsonOrError<ClanJoinResponse>(res);
 }
 
 export async function apiClanContribute(amount: number): Promise<ClanContributeResponse> {
   const body: ClanContributeRequest = { amount };
   const res = await fetch(`${API_BASE}/clan/contribute`, withUserHeaders({ method: 'POST', body: JSON.stringify(body) }));
-  return res.json();
+  return jsonOrError<ClanContributeResponse>(res);
 }
 
 // New: members/roles
 export async function apiClanMembers() {
   const res = await fetch(`${API_BASE}/clan/members`, withUserHeaders());
-  return res.json();
+  return jsonOrError(res);
 }
 
 export async function apiClanSetRole(userId: string, role: 'leader'|'novice'|'warden'|'seer') {
   const res = await fetch(`${API_BASE}/clan/role`, withUserHeaders({ method:'POST', body: JSON.stringify({ userId, role }) }));
-  return res.json();
+  return jsonOrError(res);
 }
 
 export async function apiClanKick(userId: string) {
   const res = await fetch(`${API_BASE}/clan/kick`, withUserHeaders({ method:'POST', body: JSON.stringify({ userId }) }));
-  return res.json();
+  return jsonOrError(res);
 }
 
 export async function apiClanLeave() {
   const res = await fetch(`${API_BASE}/clan/leave`, withUserHeaders({ method:'POST' }));
-  return res.json();
+  return jsonOrError(res);
 }
 
 // Clan search API (with mock fallback)
