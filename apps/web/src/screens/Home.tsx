@@ -36,6 +36,7 @@ export default function Home({ player, onOpenQuests, onOpenJobs, onOpenArena, on
   return (
     <div className={s.wrap}>
       <Header title={RU.title} gold={player.gold} energy={player.energy} level={player.progress.level} badgeTag={clanTag} />
+      {player.name ? <div style={{ margin:'8px 14px', fontSize:12, opacity:.9 }}>👤 {player.name}</div> : null}
 
       <section className={`${s.panel} ${s.panelGlow} ${s.appear}`}>
         <PortraitCard
