@@ -112,7 +112,7 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
             <div>Р’С‹ РјРѕР¶РµС‚Рµ РѕС‚РїСЂР°РІРёС‚СЊСЃСЏ РЅР° Р±РѕР№ СЃ РјРѕРЅСЃС‚СЂРѕРј. Р‘РѕР№ РґР»РёС‚СЃСЏ 30 РјРёРЅСѓС‚. РџРѕРєР° Р±РѕР№ РёРґРµС‚, РЅРµР»СЊР·СЏ РІС‹РїРѕР»РЅСЏС‚СЊ Р·Р°РґР°РЅРёСЏ Рё СЂР°Р±РѕС‚Р°С‚СЊ.</div>
             <div style={{opacity:.85, fontSize:12}}>РўРµРєСѓС‰Р°СЏ РјРѕС‰СЊ: {power}</div>
             <div style={{display:'grid', gap:8, marginTop:8}}>
-              {MONSTERS.map((m) => {
+              {[...MONSTERS].sort((a:any,b:any)=>a.diffMul-b.diffMul).map((m) => {
                 const level = player.progress.level;
                 const difficulty = Math.round((40 + level * 8) * m.diffMul);
                 const base = 0.5 + (power - difficulty) / 100;
