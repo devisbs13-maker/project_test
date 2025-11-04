@@ -17,6 +17,8 @@ import { loadPlayer, savePlayer, tickEnergy, createPlayer } from './store/player
 import { ensureDevSession } from './store/session';
 import { apiVerifyAuth } from './utils/api';
 import { getTelegramUser } from './utils/telegram';
+import { notifyEnergyFull } from './utils/energy';
+import { showToast } from './utils/notify';
 
 function usePlayerState() {
   const [player, setPlayer] = useState<Player | null>(null);
@@ -27,7 +29,12 @@ function usePlayerState() {
   useEffect(() => {
     if (!player) return;
     const id = setInterval(() => {
+      const wasFull = player.energy >= player.energyMax;
       const next = tickEnergy(player);
+      if (!wasFull && next.energy >= next.energyMax) {
+        try { showToast('Энергия полная ⚡'); } catch {}
+        try { notifyEnergyFull(); } catch {}
+      }
       if (next.energy !== player.energy || next.lastEnergyTs !== player.lastEnergyTs) {
         setPlayer(next);
         savePlayer(next);

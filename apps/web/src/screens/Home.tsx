@@ -1,11 +1,13 @@
 import Header from '../components/Header';
 import Button from '../components/Button';
 import { RU } from '../i18n/ru';
-import { Player } from '../store/player';
+import { Player, ENERGY_REGEN_INTERVAL_MS } from '../store/player';
 import s from './Home.module.css';
 import { CLASS_ASSETS } from '../assets/classes';
 import PortraitCard from '../components/PortraitCard';
 import { useEffect, useState } from 'react';
+import { msToNextEnergy } from '../utils/energy';
+import { formatRemaining } from '../utils/time';
 
 type Props = {
   player: Player;
@@ -21,6 +23,7 @@ type Props = {
 export default function Home({ player, onOpenQuests, onOpenJobs, onOpenArena, onOpenGuild, onOpenCharacter, setScreen }: Props) {
   const cls = CLASS_ASSETS[player.classId];
   const [clanTag, setClanTag] = useState<string | null>(null);
+  const [msLeft, setMsLeft] = useState<number>(0);
 
   useEffect(() => {
     let done = false;
@@ -33,10 +36,22 @@ export default function Home({ player, onOpenQuests, onOpenJobs, onOpenArena, on
     return () => { done = true; };
   }, []);
 
+  // Energy countdown (client-side)
+  useEffect(() => {
+    const recalc = () => setMsLeft(msToNextEnergy((player as any).lastEnergyTs, ENERGY_REGEN_INTERVAL_MS, player.energy, player.energyMax));
+    recalc();
+    const id = setInterval(recalc, 1000);
+    return () => clearInterval(id);
+  }, [player.energy, player.energyMax, (player as any).lastEnergyTs]);
+
   return (
     <div className={s.wrap}>
       <Header title={RU.title} gold={player.gold} energy={player.energy} level={player.progress.level} badgeTag={clanTag} />
       {player.name ? <div style={{ margin:'8px 14px', fontSize:12, opacity:.9 }}>👤 {player.name}</div> : null}
+
+      {player.energy < player.energyMax ? (
+        <div style={{ margin:'0 14px 8px', fontSize:12, opacity:.75 }}>⚡ +1 через: {formatRemaining(msLeft)}</div>
+      ) : null}
 
       <section className={`${s.panel} ${s.panelGlow} ${s.appear}`}>
         <PortraitCard
