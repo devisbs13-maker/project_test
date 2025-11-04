@@ -7,6 +7,7 @@ import { loadGame, saveGame, type TaskDef, type GameState, type ActiveTask, type
 import { now, secs, remainingMs } from '../utils/time';
 import type { Player } from '../store/player';
 import { savePlayer } from '../store/player';
+import { loadBattle, isBattleActive } from '../store/battle';
 import { grantReward } from '../utils/progression';
 
 type Props = { player: Player; onBack: () => void; onUpdatePlayer: (p: Player) => void };
@@ -40,6 +41,7 @@ export default function Quests({ player, onBack, onUpdatePlayer }: Props) {
   }
 
   function start(def: TaskDef) {
+    try { if (isBattleActive(loadBattle())) { alert('Сейчас идет бой с монстром. Квесты недоступны.'); return; } } catch {}
     const energy = def.costEnergy ?? 0;
     if (energy > 0 && player.energy < energy) { alert('Недостаточно энергии'); return; }
     if (countActive('quest') >= state.limits.quest) { alert(`Достигнут лимит активных квестов: ${state.limits.quest}`); return; }
@@ -71,6 +73,12 @@ export default function Quests({ player, onBack, onUpdatePlayer }: Props) {
 
   return (
     <div style={{padding:16, display:'grid', gap:12}}>
+      {(() => { try { return isBattleActive(loadBattle()); } catch { return false; } })() && (
+        <section style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)'}}>
+          <b>Сейчас идет бой с монстром</b>
+          <div style={{opacity:.85, marginTop:6}}>Во время боя нельзя выполнять квесты. Вернитесь после окончания боя.</div>
+        </section>
+      )}
       <Header title="Квесты" gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} />
 
       <section style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)'}}>

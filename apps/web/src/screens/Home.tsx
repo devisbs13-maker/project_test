@@ -73,6 +73,7 @@ export default function Home({ player, onOpenQuests, onOpenJobs, onOpenArena, on
         <div className={s.buttonList}>
           <Button className={s.btnFull} onClick={() => { setScreen?.('quests'); onOpenQuests(); }}>{RU.buttons.quests}</Button>
           <Button className={s.btnFull} onClick={() => { setScreen?.('jobs'); onOpenJobs(); }}>{RU.buttons.jobs}</Button>
+          <Button className={s.btnFull} onClick={() => setScreen?.('monster')}>Бой с монстром</Button>
           <Button className={s.btnFull} onClick={() => setScreen?.('merchant')}>Торговец</Button>
           <Button className={s.btnFull} onClick={() => setScreen?.('leaderboard')}>Таблица лидеров</Button>
           <Button className={s.btnFull} onClick={onOpenArena}>{RU.buttons.arena}</Button>

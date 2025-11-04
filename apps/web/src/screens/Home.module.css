@@ -95,6 +95,11 @@
   gap: 10px;
 }
 
+/* Hide obsolete leaderboard button (5th in the list) */
+.buttonList > button:nth-child(5) {
+  display: none !important;
+}
+
 .btnFull {
   width: 100%;
   text-align: left;             /* или center, по желанию */

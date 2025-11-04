@@ -8,6 +8,11 @@ export type ItemDef = {
   rarity: Rarity;
   basePrice: number;      // for BUY baseline
   sellBase?: number;      // optional baseline for SELL (otherwise basePrice*0.45)
+  // optional equipment metadata (used by clothing sets)
+  requiredLevel?: number;
+  classReq?: 'warrior'|'volkhv'|'hunter';
+  // optional image/icon url for UI
+  image?: string;
 };
 
 export type Offer = {

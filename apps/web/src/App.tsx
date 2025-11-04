@@ -6,7 +6,8 @@ import Home from './screens/Home';
 import Jobs from './screens/Jobs';
 import Quests from './screens/Quests';
 import Character from './screens/Character';
-import Leaderboard from './screens/Leaderboard';
+// import Leaderboard from './screens/Leaderboard';
+import Monster from './screens/Monster';
 import Merchant from './screens/Merchant';
 import Clan from './screens/Clan';
 import ClanCreate from './screens/ClanCreate';
@@ -55,7 +56,8 @@ function HomeRoute({ player, updatePlayer }: { player: Player; updatePlayer: (p:
         if (s === 'quests') navigate('/quests');
         else if (s === 'jobs') navigate('/jobs');
         else if (s === 'merchant') navigate('/merchant');
-        else if (s === 'leaderboard') navigate('/leaderboard');
+        else if (s === 'leaderboard') navigate('/monster');
+        else if (s === 'monster') navigate('/monster');
         else if (s === 'character') navigate('/character');
         else if (s === 'home') navigate('/');
       }}
@@ -117,8 +119,8 @@ export default function App() {
         <Route path="/character" element={player ? (
           <Character player={player} onBack={() => history.back()} onUpdatePlayer={updatePlayer} />
         ) : <Navigate to="/" replace />} />
-        <Route path="/leaderboard" element={player ? (
-          <Leaderboard player={player} onBack={() => history.back()} />
+        <Route path="/monster" element={player ? (
+          <Monster player={player} onBack={() => history.back()} onUpdatePlayer={updatePlayer} />
         ) : <Navigate to="/" replace />} />
         <Route path="/merchant" element={player ? (
           <Merchant player={player} onBack={() => history.back()} onUpdatePlayer={updatePlayer} />
