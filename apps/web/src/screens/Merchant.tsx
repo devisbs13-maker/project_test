@@ -19,7 +19,7 @@ function rarityColor(r: string) {
 }
 
 export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
-  const [tab, setTab] = useState<'buy'|'sell'>('buy');
+  const [tab, setTab] = useState<'buy'|'sell'>('buy'); const [slotTab, setSlotTab] = useState<'all'|'helmet'|'chest'|'pants'|'boots'|'gloves'|'misc'>('all');
   const [eco, setEco] = useState<MerchantState>(() => {
     const s = loadEconomy();
     if (!s || isStale(s)) {
@@ -39,7 +39,7 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
     const def = defsById.get(itemId);
     if (!def || offer.qty <= 0 || player.gold < offer.price) return;
 
-    const newItem: Item = { id: def.id, name: def.name, slot: def.slot as any, rarity: def.rarity };
+    const newItem: Item = { id: def.id, name: def.name, slot: def.slot as any, rarity: def.rarity, requiredLevel: (def as any).requiredLevel, classReq: (def as any).classReq };
     const pNext: Player = { ...player, gold: player.gold - offer.price, inventory: [...player.inventory, newItem] };
     savePlayer(pNext); onUpdatePlayer(pNext);
 
@@ -80,7 +80,7 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
         <section style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)'}}>
           <div style={{display:'grid', gap:8}}>
             {eco.offers.length===0 && <div style={{opacity:.8}}>Сегодня товаров нет.</div>}
-            {eco.offers.map(o => {
+            {eco.offers.filter(o => { const d = defsById.get(o.itemId); return slotTab==='all' ? true : (d && d.slot===slotTab); }).map(o => {
               const def = defsById.get(o.itemId);
               if (!def) return null;
               const out = o.qty<=0; const cant = player.gold < o.price || out;
@@ -121,4 +121,5 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
     </div>
   );
 }
+
 
