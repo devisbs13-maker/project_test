@@ -20,7 +20,7 @@ export default function ClanCreate({ player, onBack }: Props) {
     if (!/^[A-Z]{2,5}$/.test(cleanTag)) { alert('Р СћР ВµР С–: 2РІР‚вЂњ5 Р В·Р В°Р С–Р В»Р В°Р Р†Р Р…РЎвЂ№РЎвЂ¦ AРІР‚вЂњZ'); return; }
     setBusy(true);
     try {
-      const res = await apiClanCreate(s.userId, name.trim(), cleanTag);
+      const res = await apiClanCreate(name.trim(), cleanTag);
       if (res?.error) alert(res.error); else { alert('Р С™Р В»Р В°Р Р… РЎРѓР С•Р В·Р Т‘Р В°Р Р…'); navigate('/clan'); }
     } finally { setBusy(false); }
   }
@@ -39,4 +39,3 @@ export default function ClanCreate({ player, onBack }: Props) {
     </div>
   );
 }
-
