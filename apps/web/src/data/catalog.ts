@@ -1,12 +1,44 @@
 import type { ItemDef } from '../store/economy';
 
+const tiers = [
+  { t:1, lvl:1,   rarity:'common'   as const, price:120 },
+  { t:2, lvl:20,  rarity:'uncommon' as const, price:320 },
+  { t:3, lvl:40,  rarity:'rare'     as const, price:780 },
+  { t:4, lvl:60,  rarity:'epic'     as const, price:1500 },
+];
+
+const slots = ['helmet','chest','pants','boots','gloves'] as const;
+
+function nameFor(cls: string, slot: string, tier: number): string {
+  const slotRu: Record<string,string> = { helmet:'Шлем', chest:'Верх', pants:'Штаны', boots:'Ботинки', gloves:'Перчатки' };
+  const tierRu = ['Новобранец','Ветеран','Элитный','Чемпион'];
+  const classRu: Record<string,string> = { warrior:'Воина', volkhv:'Волхва', hunter:'Охотника' };
+  return ${slotRu[slot]}  ;
+}
+
+function makeSet(cls: 'warrior'|'volkhv'|'hunter'): ItemDef[] {
+  const out: ItemDef[] = [];
+  for (const { t, lvl, rarity, price } of tiers) {
+    for (const s of slots) {
+      out.push({
+        id: ${cls}__t,
+        name: nameFor(cls, s, t),
+        slot: s,
+        rarity,
+        basePrice: price,
+        requiredLevel: lvl,
+        classReq: cls,
+      });
+    }
+  }
+  return out;
+}
+
 export const CATALOG: ItemDef[] = [
-  { id:'herb',    name:'РўСЂР°РІС‹',             slot:'misc',   rarity:'common',   basePrice: 12 },
-  { id:'hide',    name:'Р’С‹РґРµР»Р°РЅРЅР°СЏ РєРѕР¶Р°',    slot:'misc',   rarity:'common',   basePrice: 28 },
-  { id:'oakbow',  name:'Р”СѓР±РѕРІС‹Р№ Р»СѓРє',        slot:'weapon', rarity:'uncommon', basePrice: 95 },
-  { id:'coat',    name:'РџР»РѕС‚РЅС‹Р№ РїР»Р°С‰',       slot:'armor',  rarity:'uncommon', basePrice: 110 },
-  { id:'rune',    name:'Р СѓРЅР° СЃРёР»С‹',          slot:'amulet', rarity:'rare',     basePrice: 240 },
-  { id:'sword',   name:'РЎС‚Р°Р»СЊРЅРѕР№ РјРµС‡',       slot:'weapon', rarity:'rare',     basePrice: 320 },
-  { id:'amulet',  name:'РђРјСѓР»РµС‚ СѓРґР°С‡Рё',       slot:'amulet', rarity:'epic',     basePrice: 560 },
+  ...makeSet('warrior'),
+  ...makeSet('volkhv'),
+  ...makeSet('hunter'),
+  { id:'herb', name:'Травы', slot:'misc', rarity:'common', basePrice:12 },
+  { id:'hide', name:'Шкура зверя', slot:'misc', rarity:'common', basePrice:28 },
 ];
 
