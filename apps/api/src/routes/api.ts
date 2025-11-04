@@ -11,8 +11,48 @@ import {
   Location,
 } from '@repo/shared';
 import { simulateBattle, toBattleClass } from '../domain/BattleSimulator.js';
+import { ensurePlayer, parseInitData, verifySignature } from '../middlewares/verifyInitData.js';
 
 export async function apiRoutes(app: FastifyInstance) {
+  // POST /auth/verify — verify Telegram initData and upsert player; returns basic session info
+  app.post('/auth/verify', async (req, reply) => {
+    try {
+      const body = (req.body ?? {}) as any;
+      const initDataRaw = String(body.initData || body.init_data || '');
+      const bypass = String(process.env.TELEGRAM_AUTH_BYPASS || '').toLowerCase() === 'true';
+      const botToken = process.env.TELEGRAM_BOT_TOKEN || process.env.BOT_TOKEN || '';
+
+      if (!initDataRaw && !bypass) {
+        return reply.code(400).send({ ok: false, error: 'Missing initData' });
+      }
+
+      let userPayload: any = undefined;
+      if (initDataRaw) {
+        const parsed = parseInitData(initDataRaw);
+        if (!bypass) {
+          if (!botToken) return reply.code(500).send({ ok: false, error: 'Server config' });
+          if (!verifySignature(parsed, botToken)) {
+            return reply.code(401).send({ ok: false, error: 'Invalid signature' });
+          }
+        }
+        try { userPayload = parsed.user ? JSON.parse(parsed.user) : undefined; } catch {}
+      }
+
+      if (!userPayload && bypass) {
+        userPayload = { id: 'local-user', username: 'local' };
+      }
+
+      if (!userPayload?.id) return reply.code(401).send({ ok: false, error: 'No user' });
+
+      const userId = await ensurePlayer(userPayload);
+      const username = userPayload?.username || null;
+      const name = [userPayload?.first_name, userPayload?.last_name].filter(Boolean).join(' ') || username || `tg_${userId}`;
+      return { ok: true, userId, name, username };
+    } catch (e) {
+      app.log.error({ err: e }, 'auth.verify failed');
+      return reply.code(500).send({ ok: false, error: 'failed' });
+    }
+  });
   // POST /auth/telegram — relies on middleware to set req.playerId
   app.post('/auth/telegram', async (req) => {
     const player = PlayerSchema.parse({

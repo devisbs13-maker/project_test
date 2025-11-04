@@ -4,7 +4,7 @@ import { db } from '../db/client.js';
 import { players } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 
-function parseInitData(raw: string): Record<string, string> {
+export function parseInitData(raw: string): Record<string, string> {
   const out: Record<string, string> = {};
   for (const part of raw.split('&')) {
     if (!part) continue;
@@ -18,7 +18,7 @@ function parseInitData(raw: string): Record<string, string> {
   return out;
 }
 
-function verifySignature(initData: Record<string, string>, botToken: string): boolean {
+export function verifySignature(initData: Record<string, string>, botToken: string): boolean {
   const providedHash = initData['hash'];
   if (!providedHash) return false;
 
@@ -35,15 +35,22 @@ function verifySignature(initData: Record<string, string>, botToken: string): bo
   return hex === providedHash.toLowerCase();
 }
 
-async function ensurePlayer(userPayload: any): Promise<string> {
+export async function ensurePlayer(userPayload: any): Promise<string> {
   const tgId: string = String(userPayload?.id ?? '');
   if (!tgId) throw new Error('Invalid telegram user id');
   const existing = db.select().from(players).where(eq(players.id, tgId)).all();
-  if (existing.length > 0) return existing[0].id;
+  const desiredName = [userPayload?.first_name, userPayload?.last_name].filter(Boolean).join(' ')
+    || userPayload?.username
+    || `tg_${tgId}`;
+  if (existing.length > 0) {
+    // Update name if changed to keep nickname in sync with Telegram
+    if (existing[0].name !== desiredName) {
+      db.run(`UPDATE players SET name = ? WHERE id = ?`, [desiredName, tgId]);
+    }
+    return existing[0].id;
+  }
 
-  const name = [userPayload?.first_name, userPayload?.last_name].filter(Boolean).join(' ') ||
-    userPayload?.username || `tg_${tgId}`;
-  db.insert(players).values({ id: tgId, name, level: 1, class: 'Warrior', gold: 0 }).run();
+  db.insert(players).values({ id: tgId, name: desiredName, level: 1, class: 'Warrior', gold: 0 }).run();
   return tgId;
 }
 

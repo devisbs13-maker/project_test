@@ -15,6 +15,7 @@ import ClanBrowse from './screens/ClanBrowse';
 import type { Player } from './store/player';
 import { loadPlayer, savePlayer, tickEnergy, createPlayer } from './store/player';
 import { ensureDevSession } from './store/session';
+import { apiVerifyAuth } from './utils/api';
 
 function usePlayerState() {
   const [player, setPlayer] = useState<Player | null>(null);
@@ -64,15 +65,25 @@ export default function App() {
   const { player, updatePlayer } = usePlayerState();
   useEffect(() => {
     ensureDevSession();
-    if (!player) {
-      const p = loadPlayer();
+    (async () => {
+      // Seed local player if missing
+      let p = loadPlayer();
       if (!p) {
-        const seeded = createPlayer('warrior', '\\u0412\\u043e\\u0438\\u043d');
-        updatePlayer(seeded);
-      } else {
+        p = createPlayer('warrior', '\\u0412\\u043e\\u0438\\u043d');
+        updatePlayer(p);
+      } else if (!player) {
         updatePlayer(p);
       }
-    }
+      // Try Telegram auth; if present, sync nickname to Telegram username/display name
+      try {
+        const session = await apiVerifyAuth();
+        if (session && p) {
+          if (p.name !== session.name) {
+            updatePlayer({ ...p, name: session.name });
+          }
+        }
+      } catch {}
+    })();
   }, []);
   return (
     <div className="app">
