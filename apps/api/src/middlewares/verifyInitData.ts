@@ -56,8 +56,10 @@ export async function ensurePlayer(userPayload: any): Promise<string> {
 
 export async function verifyInitData(app: FastifyInstance) {
   app.addHook('onRequest', async (req: FastifyRequest, reply: FastifyReply) => {
-    // Allow unauthenticated health checks
-    if (req.method === 'GET' && req.url.startsWith('/healthz')) return;
+    // Allow unauthenticated health checks and public lists
+    if (req.method === 'GET' && (req.url.startsWith('/health') || req.url.startsWith('/healthz'))) return;
+    if (req.method === 'GET' && req.url.startsWith('/faction/list')) return;
+    if (req.method === 'GET' && req.url.startsWith('/leaderboard')) return;
     if (req.method === 'POST' && req.url.startsWith('/auth/verify')) return;
 
     const botToken = process.env.TELEGRAM_BOT_TOKEN || process.env.BOT_TOKEN;

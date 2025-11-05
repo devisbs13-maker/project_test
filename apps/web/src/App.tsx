@@ -14,6 +14,7 @@ const ClanBrowse = lazy(() => import('./screens/ClanBrowse'));
 const Duel = lazy(() => import('./screens/Duel'));
 const Factions = lazy(() => import('./screens/Factions'));
 const ClassSelect = lazy(() => import('./screens/ClassSelect'));
+const Leaderboard = lazy(() => import('./screens/Leaderboard'));
 
 import type { Player } from './store/player';
 import { loadPlayer, savePlayer, tickEnergy, createPlayer, normalizePlayer } from './store/player';
@@ -58,7 +59,7 @@ function HomeRoute({ player, updatePlayer }: { player: Player; updatePlayer: (p:
         if (s === 'quests') navigate('/quests');
         else if (s === 'jobs') navigate('/jobs');
         else if (s === 'merchant') navigate('/merchant');
-        else if (s === 'leaderboard') navigate('/monster');
+        else if (s === 'leaderboard') navigate('/leaderboard');
         else if (s === 'monster') navigate('/monster');
         else if (s === 'character') navigate('/character');
         else if (s === 'home') navigate('/');
@@ -159,6 +160,9 @@ export default function App() {
           ) : <Navigate to="/" replace />} />
           <Route path="/duel" element={player ? (
             <Duel player={player} onBack={() => history.back()} />
+          ) : <Navigate to="/" replace />} />
+          <Route path="/leaderboard" element={player ? (
+            <Leaderboard player={player} onBack={() => history.back()} />
           ) : <Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
