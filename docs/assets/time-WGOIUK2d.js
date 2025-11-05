@@ -1,0 +1,1 @@
+const a=()=>Date.now(),c=s=>s*1e3,e=s=>Math.max(0,s-a()),r=s=>{const n=Math.ceil(s/1e3),t=Math.floor(n/60),o=n%60;return t>0?"".concat(t,"м ").concat(o,"с"):"".concat(o,"с")};export{r as f,a as n,e as r,c as s};

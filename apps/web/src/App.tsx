@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 
-// Original screens with styling and layout
-import Home from './screens/Home';
-import Jobs from './screens/Jobs';
-import Quests from './screens/Quests';
-import Character from './screens/Character';
-// import Leaderboard from './screens/Leaderboard';
-import Monster from './screens/Monster';
-import Merchant from './screens/Merchant';
-import Clan from './screens/Clan';
-import ClanCreate from './screens/ClanCreate';
-import ClanBrowse from './screens/ClanBrowse';
+// Lazy-load screens to avoid cyclic/TDZ issues during initial boot
+const Home = lazy(() => import('./screens/Home'));
+const Jobs = lazy(() => import('./screens/Jobs'));
+const Quests = lazy(() => import('./screens/Quests'));
+const Character = lazy(() => import('./screens/Character'));
+const Monster = lazy(() => import('./screens/Monster'));
+const Merchant = lazy(() => import('./screens/Merchant'));
+const Clan = lazy(() => import('./screens/Clan'));
+const ClanCreate = lazy(() => import('./screens/ClanCreate'));
+const ClanBrowse = lazy(() => import('./screens/ClanBrowse'));
 
 import type { Player } from './store/player';
 import { loadPlayer, savePlayer, tickEnergy, createPlayer } from './store/player';
@@ -108,34 +107,36 @@ export default function App() {
   }, []);
   return (
     <div className="app">
-      <Routes>
-        <Route path="/" element={player ? <HomeRoute player={player} updatePlayer={updatePlayer} /> : <div style={{padding:16}}>{'\\u0417\\u0430\\u0433\\u0440\\u0443\\u0437\\u043a\\u0430\\u2026'}</div>} />
-        <Route path="/quests" element={player ? (
-          <Quests player={player} onBack={() => history.back()} onUpdatePlayer={updatePlayer} />
-        ) : <Navigate to="/" replace />} />
-        <Route path="/jobs" element={player ? (
-          <Jobs player={player} onBack={() => history.back()} onUpdatePlayer={updatePlayer} />
-        ) : <Navigate to="/" replace />} />
-        <Route path="/character" element={player ? (
-          <Character player={player} onBack={() => history.back()} onUpdatePlayer={updatePlayer} />
-        ) : <Navigate to="/" replace />} />
-        <Route path="/monster" element={player ? (
-          <Monster player={player} onBack={() => history.back()} onUpdatePlayer={updatePlayer} />
-        ) : <Navigate to="/" replace />} />
-        <Route path="/merchant" element={player ? (
-          <Merchant player={player} onBack={() => history.back()} onUpdatePlayer={updatePlayer} />
-        ) : <Navigate to="/" replace />} />
-        <Route path="/clan" element={player ? (
-          <Clan player={player} onBack={() => history.back()} />
-        ) : <Navigate to="/" replace />} />
-        <Route path="/clan/create" element={player ? (
-          <ClanCreate player={player} onBack={() => history.back()} />
-        ) : <Navigate to="/" replace />} />
-        <Route path="/clan/browse" element={player ? (
-          <ClanBrowse player={player} onBack={() => history.back()} />
-        ) : <Navigate to="/" replace />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <Suspense fallback={<div style={{padding:16}}>{'\\u0417\\u0430\\u0433\\u0440\\u0443\\u0437\\u043a\\u0430\\u2026'}</div>}>
+        <Routes>
+          <Route path="/" element={player ? <HomeRoute player={player} updatePlayer={updatePlayer} /> : <div style={{padding:16}}>{'\\u0417\\u0430\\u0433\\u0440\\u0443\\u0437\\u043a\\u0430\\u2026'}</div>} />
+          <Route path="/quests" element={player ? (
+            <Quests player={player} onBack={() => history.back()} onUpdatePlayer={updatePlayer} />
+          ) : <Navigate to="/" replace />} />
+          <Route path="/jobs" element={player ? (
+            <Jobs player={player} onBack={() => history.back()} onUpdatePlayer={updatePlayer} />
+          ) : <Navigate to="/" replace />} />
+          <Route path="/character" element={player ? (
+            <Character player={player} onBack={() => history.back()} onUpdatePlayer={updatePlayer} />
+          ) : <Navigate to="/" replace />} />
+          <Route path="/monster" element={player ? (
+            <Monster player={player} onBack={() => history.back()} onUpdatePlayer={updatePlayer} />
+          ) : <Navigate to="/" replace />} />
+          <Route path="/merchant" element={player ? (
+            <Merchant player={player} onBack={() => history.back()} onUpdatePlayer={updatePlayer} />
+          ) : <Navigate to="/" replace />} />
+          <Route path="/clan" element={player ? (
+            <Clan player={player} onBack={() => history.back()} />
+          ) : <Navigate to="/" replace />} />
+          <Route path="/clan/create" element={player ? (
+            <ClanCreate player={player} onBack={() => history.back()} />
+          ) : <Navigate to="/" replace />} />
+          <Route path="/clan/browse" element={player ? (
+            <ClanBrowse player={player} onBack={() => history.back()} />
+          ) : <Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     </div>
   );
 }

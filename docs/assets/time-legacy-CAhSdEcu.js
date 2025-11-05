@@ -1,0 +1,1 @@
+System.register([],function(t,n){"use strict";return{execute:function(){var n=t("n",function(){return Date.now()});t("s",function(t){return 1e3*t}),t("r",function(t){return Math.max(0,t-n())}),t("f",function(t){var n=Math.ceil(t/1e3),r=Math.floor(n/60),e=n%60;return r>0?"".concat(r,"м ").concat(e,"с"):"".concat(e,"с")})}}});
