@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Header from '../components/Header';
 import Button from '../components/Button';
 import type { Player, Item } from '../store/player';
@@ -41,6 +41,7 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
       setEco(regen);
     }
   } catch {}
+
   function buy(itemId: string) {
     const offIdx = eco.offers.findIndex(o => o.itemId === itemId);
     if (offIdx === -1) return;
@@ -57,7 +58,7 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
     const nextEco = { ...eco, offers };
     setEco(nextEco); saveEconomy(nextEco);
 
-    notifyAll('quest', 'РџРѕРєСѓРїРєР°', { gold: -offer.price });
+    notifyAll('quest', 'Purchase', { gold: -offer.price });
     const tg = (window as any).Telegram?.WebApp; tg?.sendData?.(JSON.stringify({ type:'purchase', title:def.name, price:offer.price, qty:1 }));
   }
 
@@ -72,7 +73,7 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
     const pNext: Player = { ...player, gold: player.gold - unitPrice, inventory: [...player.inventory, newItem] };
     savePlayer(pNext); onUpdatePlayer(pNext);
     try {
-      notifyAll('quest', 'РџРѕРєСѓРїРєР°', { gold: -unitPrice });
+      notifyAll('quest', 'Purchase', { gold: -unitPrice });
       const tg = (window as any).Telegram?.WebApp; tg?.sendData?.(JSON.stringify({ type:'purchase', title:def.name, price:unitPrice, qty:1 }));
     } catch {}
   }
@@ -93,8 +94,8 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
     const pNext: Player = { ...player, gold: player.gold + price, inventory: newInv };
     savePlayer(pNext); onUpdatePlayer(pNext);
 
-    notifyAll('quest', 'РџСЂРѕРґР°Р¶Р°', { gold: price });
-    const tg = (window as any).Telegram?.WebApp; tg?.sendData?.(JSON.stringify({ type:'sale', title:def?.name ?? it.name ?? 'РўРѕРІР°СЂ', price, qty:1 }));
+    notifyAll('quest', 'Sale', { gold: price });
+    const tg = (window as any).Telegram?.WebApp; tg?.sendData?.(JSON.stringify({ type:'sale', title:def?.name ?? it.name ?? 'Item', price, qty:1 }));
   }
 
   return (
@@ -128,8 +129,8 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
                     <div style={{display:'flex', alignItems:'center', gap:10}}>
                       {def.image ? <img src={def.image} alt={def.name} style={{width:32,height:32,objectFit:'cover',borderRadius:6}} /> : <div style={{width:32,height:32,borderRadius:6,background:'rgba(255,255,255,0.07)'}} />}
                       <div>
-                        <div style={{fontWeight:700}}>{def.name} <span style={{color:rarityColor(def.rarity), fontSize:12, marginLeft:6}}>СЂРµРґРєРѕСЃС‚СЊ: {def.rarity}</span></div>
-                        <div style={{opacity:.85, fontSize:12}}>Р¦РµРЅР°: в‚Ѕ {price}</div>
+                        <div style={{fontWeight:700}}>{def.name} <span style={{color:rarityColor(def.rarity), fontSize:12, marginLeft:6}}>Rarity: {def.rarity}</span></div>
+                        <div style={{opacity:.85, fontSize:12}}>Price: {price}</div>
                       </div>
                     </div>
                     <Button onClick={()=>buyFromCatalog(def.id)} disabled={cant}>Buy</Button>
@@ -148,7 +149,7 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
                     if (items.length===0) return null;
                     return (
                       <div key={`${cls}_t${tier}`} style={{display:'grid', gap:6}}>
-                        <div style={{opacity:.9, fontWeight:700}}>{`РЎРµС‚ ${cls} t${tier}`}</div>
+                        <div style={{opacity:.9, fontWeight:700}}>{`Set ${cls} T${tier}`}</div>
                         {items.map(def => {
                           const base = Math.round(def.basePrice * rarityFactor(def.rarity));
                           const price = priceFor('buy', base, player);
@@ -158,8 +159,8 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
                               <div style={{display:'flex', alignItems:'center', gap:10}}>
                                 {def.image ? <img src={def.image} alt={def.name} style={{width:36,height:36,objectFit:'cover',borderRadius:6}} /> : <div style={{width:36,height:36,borderRadius:6,background:'rgba(255,255,255,0.07)'}} />}
                                 <div>
-                                  <div style={{fontWeight:700}}>{def.name} <span style={{color:rarityColor(def.rarity), fontSize:12, marginLeft:6}}>СЂРµРґРєРѕСЃС‚СЊ: {def.rarity}</span></div>
-                                  <div style={{opacity:.85, fontSize:12}}>Р¦РµРЅР°: в‚Ѕ {price} {def.requiredLevel ? `вЂў СѓСЂ. ${def.requiredLevel}+` : ''}</div>
+                                  <div style={{fontWeight:700}}>{def.name} <span style={{color:rarityColor(def.rarity), fontSize:12, marginLeft:6}}>Rarity: {def.rarity}</span></div>
+                                  <div style={{opacity:.85, fontSize:12}}>Price: {price} {def.requiredLevel ? `• Req Lv. ${def.requiredLevel}+` : ''}</div>
                                 </div>
                               </div>
                               <Button onClick={()=>buyFromCatalog(def.id)} disabled={cant}>Buy</Button>
@@ -179,11 +180,11 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
               {(['warrior','volkhv','hunter'] as const).map(cls => (
                 <div key={cls} style={{display:'grid', gap:8}}>
                   {[1,2,3,4].map(tier => {
-                    const items = weaponDefs.filter(d => (d as any).classReq===cls && /_t\\d+$/.test(d.id) && d.id.endsWith(`t${tier}`));
+                    const items = weaponDefs.filter(d => (d as any).classReq===cls && /_t\d+$/.test(d.id) && d.id.endsWith(`t${tier}`));
                     if (items.length===0) return null;
                     return (
                       <div key={`${cls}_t${tier}`} style={{display:'grid', gap:6}}>
-                        <div style={{opacity:.9, fontWeight:700}}>{`Weapons ${cls} t${tier}`}</div>
+                        <div style={{opacity:.9, fontWeight:700}}>{`Weapons ${cls} T${tier}`}</div>
                         {items.map(def => {
                           const base = Math.round(def.basePrice * rarityFactor(def.rarity));
                           const price = priceFor('buy', base, player);
@@ -193,8 +194,8 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
                               <div style={{display:'flex', alignItems:'center', gap:10}}>
                                 {def.image ? <img src={def.image} alt={def.name} style={{width:36,height:36,objectFit:'cover',borderRadius:6}} /> : <div style={{width:36,height:36,borderRadius:6,background:'rgba(255,255,255,0.07)'}} />}
                                 <div>
-                                  <div style={{fontWeight:700}}>{def.name} <span style={{color:rarityColor(def.rarity), fontSize:12, marginLeft:6}}>Раритет: {def.rarity}</span></div>
-                                  <div style={{opacity:.85, fontSize:12}}>Цена: ₽ {price} {def.requiredLevel ? `и ур. ${def.requiredLevel}+` : ''}</div>
+                                  <div style={{fontWeight:700}}>{def.name} <span style={{color:rarityColor(def.rarity), fontSize:12, marginLeft:6}}>Rarity: {def.rarity}</span></div>
+                                  <div style={{opacity:.85, fontSize:12}}>Price: {price} {def.requiredLevel ? `• Req Lv. ${def.requiredLevel}+` : ''}</div>
                                 </div>
                               </div>
                               <Button onClick={()=>buyFromCatalog(def.id)} disabled={cant}>Buy</Button>
@@ -214,17 +215,19 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
       {tab==='sell' && (
         <section style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)'}}>
           <div style={{display:'grid', gap:8}}>
-            {player.inventory.length===0 && <div style={{opacity:.8}}>РЈ РІР°СЃ РЅРµС‚ РїСЂРµРґРјРµС‚РѕРІ РґР»СЏ РїСЂРѕРґР°Р¶Рё.</div>}
+            {player.inventory.length===0 && <div style={{opacity:.8}}>No items to sell.</div>}
             {player.inventory.map((it, idx) => {
               const def = defsById.get(it.id);
               const price = def ? sellPriceFor(def, player) : 10;
               return (
-                <div key={idx} style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 12px', borderRadius:12, background:'var(--panel-bg)', border:'1px solid rgba(255,255,255,0.08)'}}>
-                  <div>
-                    <div style={{fontWeight:700}}>{it.name ?? def?.name ?? it.id} {def && <span style={{color:rarityColor(def.rarity), fontSize:12, marginLeft:6}}>Р РµРґРєРѕСЃС‚СЊ: {def.rarity}</span>}</div>
-                    <div style={{opacity:.85, fontSize:12}}>Р¦РµРЅР° РїСЂРѕРґР°Р¶Рё: рџЄ™ {price}</div>
+                <div key={`${it.id}_${idx}`} style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'8px 12px', borderRadius:12, background:'var(--panel-bg)', border:'1px solid rgba(255,255,255,0.08)'}}>
+                  <div style={{display:'flex', alignItems:'center', gap:10}}>
+                    <div>
+                      <div style={{fontWeight:700}}>{it.name} {def ? <span style={{color:rarityColor(def.rarity), fontSize:12, marginLeft:6}}>Rarity: {def.rarity}</span> : null}</div>
+                      <div style={{opacity:.85, fontSize:12}}>Sell for: {price}</div>
+                    </div>
                   </div>
-                  <Button onClick={()=>sell(idx)}>Buy</Button>
+                  <Button onClick={()=>sell(idx)}>Sell</Button>
                 </div>
               );
             })}
@@ -234,8 +237,4 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
     </div>
   );
 }
-
-
-
-
 

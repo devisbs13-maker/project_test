@@ -1,4 +1,4 @@
-﻿export type ClassId = 'warrior' | 'volkhv' | 'hunter';
+export type ClassId = 'warrior' | 'volkhv' | 'hunter';
 
 export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic';
 // Expanded equipment slots for armor sets
@@ -81,7 +81,7 @@ export function normalizePlayer(raw: any): Player {
     vit: raw.stats?.vit ?? 5,
   };
   let p: Player = {
-    name:    raw.name ?? 'Р“РµСЂРѕР№',
+    name:    raw.name ?? 'Adventurer',
     classId: raw.classId ?? 'warrior',
     gold:    raw.gold ?? 0,
     goldTotal: raw.goldTotal ?? raw.goldEarnedTotal ?? 0,
@@ -169,32 +169,32 @@ export function seedStarterItems(classId: ClassId): Item[] {
   const req = 1;
   const mk = (slot: ItemSlot, name: string, bonus: Item['bonus']): Item => ({ id:`${classId}_${slot}_t${tier}`, name, slot, rarity:'common', bonus, requiredLevel:req, classReq: classId });
   if (classId === 'warrior') return [
-    mk('helmet','РЁР»РµРј РЅРѕРІРѕР±СЂР°РЅС†Р°', { vit:1 }),
-    mk('chest','РљРёСЂР°СЃР° РЅРѕРІРѕР±СЂР°РЅС†Р°', { str:1 }),
-    mk('pants','РќР°Р±РµРґСЂРµРЅРЅРёРєРё РЅРѕРІРѕР±СЂР°РЅС†Р°', { vit:1 }),
-    mk('boots','РЎР°РїРѕРіРё РЅРѕРІРѕР±СЂР°РЅС†Р°', { vit:1 }),
-    mk('gloves','РџРµСЂС‡Р°С‚РєРё РЅРѕРІРѕР±СЂР°РЅС†Р°', { str:1 }),
+    mk('helmet','Starter Helmet', { vit:1 }),
+    mk('chest','Starter Chest', { str:1 }),
+    mk('pants','Starter Pants', { vit:1 }),
+    mk('boots','Starter Boots', { vit:1 }),
+    mk('gloves','Starter Gloves', { str:1 }),
     mk('weapon','Starter Sword', { str:1 }),
   ];
   if (classId === 'volkhv') return [
-    mk('helmet','РљР°РїСЋС€РѕРЅ СѓС‡РµРЅРёРєР°', { int:1 }),
-    mk('chest','РћРґРµСЏРЅРёРµ СѓС‡РµРЅРёРєР°', { int:1 }),
-    mk('pants','РЁС‚Р°РЅС‹ СѓС‡РµРЅРёРєР°', { vit:1 }),
-    mk('boots','Р‘Р°С€РјР°РєРё СѓС‡РµРЅРёРєР°', { vit:1 }),
-    mk('gloves','РџРµСЂС‡Р°С‚РєРё СѓС‡РµРЅРёРєР°', { int:1 }),
+    mk('helmet','Starter Circlet', { int:1 }),
+    mk('chest','Starter Robe', { int:1 }),
+    mk('pants','Starter Trousers', { vit:1 }),
+    mk('boots','Starter Sandals', { vit:1 }),
+    mk('gloves','Starter Bracers', { int:1 }),
     mk('weapon','Starter Staff', { int:1 }),
   ];
   return [
-    mk('helmet','РљР°РїСЋС€РѕРЅ СЃР»РµРґРѕРїС‹С‚Р°', { agi:1 }),
-    mk('chest','Р–РёР»РµС‚ СЃР»РµРґРѕРїС‹С‚Р°', { agi:1 }),
-    mk('pants','РЁС‚Р°РЅС‹ СЃР»РµРґРѕРїС‹С‚Р°', { vit:1 }),
-    mk('boots','РЎР°РїРѕРіРё СЃР»РµРґРѕРїС‹С‚Р°', { vit:1 }),
-    mk('gloves','РџРµСЂС‡Р°С‚РєРё СЃР»РµРґРѕРїС‹С‚Р°', { agi:1 }),
+    mk('helmet','Starter Hood', { agi:1 }),
+    mk('chest','Starter Jacket', { agi:1 }),
+    mk('pants','Starter Pants', { vit:1 }),
+    mk('boots','Starter Boots', { vit:1 }),
+    mk('gloves','Starter Gloves', { agi:1 }),
     mk('weapon','Starter Bow', { agi:1 }),
   ];
 }
 
-export function createPlayer(classId: ClassId, name = 'Р“РµСЂРѕР№'): Player {
+export function createPlayer(classId: ClassId, name = 'Adventurer'): Player {
   const stats = baseStatsFor(classId);
   return {
     name, classId, gold: 100, goldTotal: 0, energy: 8, energyMax: 10, sociality: 0, karma: 0, luck: 0,
@@ -266,3 +266,4 @@ export function effectiveStats(p: Player): Stats {
   apply(eq.weapon ?? null);
   return sum;
 }
+

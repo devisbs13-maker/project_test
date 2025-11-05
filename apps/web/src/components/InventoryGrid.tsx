@@ -22,7 +22,7 @@ export default function InventoryGrid({ items, onEquip }: Props) {
           key={it.id}
           className={s.cell}
           style={{ borderColor: rarityBorder[it.rarity] }}
-          title={`${it.name} • редкость: ${it.rarity}`}
+          title={`${it.name} • Rarity: ${it.rarity}`}
           onClick={() => onEquip(it)}
         >
           <span className={s.label}>{it.name}</span>
