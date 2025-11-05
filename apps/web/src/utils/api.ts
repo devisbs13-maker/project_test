@@ -23,13 +23,15 @@ export async function apiVerifyAuth(): Promise<Session | null> {
 // Helper to attach current user via headers
 function withUserHeaders(init?: RequestInit): RequestInit {
   const s = loadSession();
-  const uname = s?.name ? encodeURIComponent(s.name) : 'guest';
+  const tg = getTelegramUser();
+  const userId = s?.userId || (tg?.id ? String(tg.id) : 'local-user');
+  const display = s?.name || (tg ? ((tg.username ? `@${tg.username}` : [tg.first_name, tg.last_name].filter(Boolean).join(' ')) || 'guest') : 'guest');
   return {
     ...(init || {}),
     headers: {
       'Content-Type': 'application/json',
-      'x-user-id': s?.userId || 'local-user',
-      'x-user-name': uname,
+      'x-user-id': userId,
+      'x-user-name': encodeURIComponent(display),
       'x-telegram-init': getInitData() || '',
       ...(init?.headers || {}),
     },
