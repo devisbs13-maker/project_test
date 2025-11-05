@@ -6,6 +6,7 @@ import { CLASS_ASSETS } from '../assets/classes';
 import type { Player, Item, ItemSlot } from '../store/player';
 import { effectiveStats } from '../store/player';
 import { useEffect, useState } from 'react';
+import { apiClanMe } from '../utils/api';
 
 type Props = {
   player: Player;
@@ -20,12 +21,12 @@ export default function Character({ player, onBack, onUpdatePlayer }: Props) {
 
   useEffect(() => {
     let done = false;
-    import('../utils/api').then(async ({ apiClanMe }) => {
+    (async () => {
       try {
         const res = await apiClanMe();
         if (!done && res?.ok && res.data) setClanTag(res.data.tag);
       } catch {}
-    });
+    })();
     return () => { done = true; };
   }, []);
 

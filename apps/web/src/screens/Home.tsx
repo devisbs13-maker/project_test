@@ -6,6 +6,7 @@ import s from './Home.module.css';
 import { CLASS_ASSETS } from '../assets/classes';
 import PortraitCard from '../components/PortraitCard';
 import { useEffect, useState } from 'react';
+import { apiClanMe } from '../utils/api';
 import { msToNextEnergy } from '../utils/energy';
 import { formatRemaining } from '../utils/time';
 
@@ -27,12 +28,12 @@ export default function Home({ player, onOpenQuests, onOpenJobs, onOpenArena, on
 
   useEffect(() => {
     let done = false;
-    import('../utils/api').then(async ({ apiClanMe }) => {
+    (async () => {
       try {
         const res = await apiClanMe();
         if (!done && res?.ok && res.data) setClanTag(res.data.tag);
       } catch {}
-    });
+    })();
     return () => { done = true; };
   }, []);
 
