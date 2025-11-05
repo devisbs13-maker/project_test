@@ -1,4 +1,4 @@
-export type Session = { userId: string; name: string; username?: string | null };
+﻿export type Session = { userId: string; name: string; username?: string | null };
 
 const KEY = 'mirevald:session';
 
@@ -19,11 +19,11 @@ export function ensureDevSession(): void {
     if (!existing) {
       const dev: any = {
         userId: 'dev',
-        name: 'Воин',
+        name: 'Р’РѕРёРЅ',
         username: null,
         player: {
           id: 'dev',
-          name: 'Воин',
+          name: 'Р’РѕРёРЅ',
           class: 'warrior',
           level: 1,
           energy: 10,
@@ -36,16 +36,6 @@ export function ensureDevSession(): void {
       };
       saveSession(dev as Session);
     }
-
-    // Also seed Player store if missing so UI can render Home
-    try {
-      // Dynamic import to avoid circular deps at module load
-      const mod = require('./player');
-      const have = mod.loadPlayer();
-      if (!have) {
-        const p = mod.createPlayer('warrior', 'Воин');
-        mod.savePlayer(p);
-      }
-    } catch {}
   } catch {}
 }
+
