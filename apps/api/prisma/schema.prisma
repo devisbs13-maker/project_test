@@ -36,3 +36,13 @@ model ClanMember {
 
   @@id([userId, clanId])
 }
+
+/// Player game state stored as JSON for quick integration.
+model PlayerState {
+  id        String   @id          // telegram user id
+  name      String
+  classId   String
+  data      Json     // full client state snapshot (inventory, equipment, stats, progress)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}

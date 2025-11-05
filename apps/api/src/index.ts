@@ -8,6 +8,7 @@ import { verifyInitData } from './middlewares/verifyInitData.js';
 import { leaderboardRoutesV1 } from './routes/leaderboard_v1.js';
 import { clanRoutesV1 } from './routes/clans_v1.js';
 import { initStorage } from './repos/index.js';
+import { playerRoutes } from './routes/player.js';
 
 const server = Fastify({
   logger: {
@@ -45,6 +46,7 @@ await initStorage();
 
 await server.register(healthRoutes);
 await server.register(apiRoutes);
+await server.register(playerRoutes);
 await server.register(leaderboardRoutesV1);
 await server.register(clanRoutesV1);
 
