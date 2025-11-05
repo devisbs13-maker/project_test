@@ -5,7 +5,8 @@ import type { Player } from '../store/player';
 import { priceFor } from './pricing';
 
 // simple daily seed from date
-const todayKey = () => new Date().toISOString().slice(0,10); // YYYY-MM-DD
+const ECO_VER = 'v2';
+const todayKey = () => `${new Date().toISOString().slice(0,10)}-${ECO_VER}`; // YYYY-MM-DD-vX
 
 export function generateDailyInventory(p: Player): MerchantState {
   const dateKey = todayKey();
