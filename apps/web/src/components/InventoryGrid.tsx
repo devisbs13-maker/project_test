@@ -1,5 +1,6 @@
 import s from './InventoryGrid.module.css';
 import type { Item } from '../store/player';
+import { getT } from '../i18n';
 
 type Props = {
   items: Item[];
@@ -22,7 +23,7 @@ export default function InventoryGrid({ items, onEquip }: Props) {
           key={it.id}
           className={s.cell}
           style={{ borderColor: rarityBorder[it.rarity] }}
-          title={`${it.name} • Rarity: ${it.rarity}`}
+          title={`${it.name} • ${(getT().merchant?.rarity ?? 'Rarity')}: ${it.rarity}`}
           onClick={() => onEquip(it)}
         >
           <span className={s.label}>{it.name}</span>
@@ -31,4 +32,3 @@ export default function InventoryGrid({ items, onEquip }: Props) {
     </div>
   );
 }
-

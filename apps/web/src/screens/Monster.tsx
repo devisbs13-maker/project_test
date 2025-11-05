@@ -4,19 +4,13 @@ import Button from '../components/Button';
 import TimerBadge from '../components/TimerBadge';
 import type { Player } from '../store/player';
 import { effectiveStats, savePlayer } from '../store/player';
-import {
-  loadBattle,
-  saveBattle,
-  isBattleActive,
-  type BattleState,
-  MONSTERS,
-  startBattleWith,
-} from '../store/battle';
+import { loadBattle, saveBattle, isBattleActive, type BattleState, MONSTERS, startBattleWith } from '../store/battle';
 import { loadGame } from '../store/game';
 import { remainingMs } from '../utils/time';
 import { notifyAll, showToast } from '../utils/notify';
 import { grantReward } from '../utils/progression';
 import { CATALOG } from '../data/catalog';
+import { getT } from '../i18n';
 
 type Props = { player: Player; onBack: () => void; onUpdatePlayer: (p: Player) => void };
 
@@ -28,6 +22,7 @@ function fmt(ms: number) {
 }
 
 export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
+  const T = getT();
   const [battle, setBattle] = useState<BattleState | null>(() => loadBattle());
   const active = isBattleActive(battle);
   const msLeft = battle ? remainingMs(battle.endsAt) : 0;
@@ -46,7 +41,7 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
     try {
       const g = loadGame();
       if ((g.active || []).length > 0) {
-        alert('Finish other activities first (quests/jobs).');
+        alert(T.monster?.finishOthers ?? 'Finish other activities first (quests/jobs).');
         return;
       }
     } catch {}
@@ -84,9 +79,7 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
         ];
         const tier = [...tiers].reverse().find((x) => level >= x.lvl) ?? tiers[0];
         const cls = player.classId;
-        const pool = CATALOG.filter(
-          (d) => (d as any).classReq === cls && /_t\d+$/.test(d.id) && d.id.endsWith(`t${tier.t}`)
-        );
+        const pool = CATALOG.filter((d) => (d as any).classReq === cls && /_t\d+$/.test(d.id) && d.id.endsWith(`t${tier.t}`));
         if (pool.length > 0) {
           const pick = pool[Math.floor(Math.random() * pool.length)];
           const newItem = {
@@ -100,18 +93,18 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
           pNext = { ...pNext, inventory: [...pNext.inventory, newItem] } as Player;
         }
       }
-      notifyAll('quest', 'Monster defeated', { gold, xp });
-      try { showToast('Victory! Rewards granted.'); } catch {}
+      notifyAll('quest', T.monster?.defeated ?? 'Monster defeated', { gold, xp });
+      try { showToast(T.monster?.victory ?? 'Victory! Rewards granted.'); } catch {}
       savePlayer(pNext);
       onUpdatePlayer(pNext);
     } else {
-      try { showToast('Defeat. Try a weaker monster.'); } catch {}
+      try { showToast(T.monster?.defeat ?? 'Defeat. Try a weaker monster.'); } catch {}
     }
   }
 
   return (
     <div style={{ display: 'grid', gap: 12, padding: 16 }}>
-      <Header title="Monster Hunt" gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} />
+      <Header title={T.buttons?.monster ?? 'Monster Hunt'} gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} />
 
       {!active && (
         <section style={{ padding: 12, borderRadius: 16, background: 'var(--panel-bg)', border: 'var(--panel-border)' }}>
@@ -144,11 +137,11 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
                       <div>
                         <div style={{ fontWeight: 700 }}>{m.name}</div>
                         <div style={{ opacity: 0.85, fontSize: 12 }}>
-                          Difficulty: {difficulty} · Win chance: {Math.round(chance * 100)}% · Reward x{m.rewardMul}
+                          {(T.monster?.difficulty ?? 'Difficulty')}: {difficulty} • {(T.monster?.winChance ?? 'Win chance')}: {Math.round(chance * 100)}% • {(T.monster?.reward ?? 'Reward')} x{m.rewardMul}
                         </div>
                       </div>
                     </div>
-                    <Button onClick={() => fight(m)}>Fight</Button>
+                    <Button onClick={() => fight(m)}>{T.monster?.fight ?? 'Fight'}</Button>
                   </div>
                 );
               })}
@@ -165,8 +158,8 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
               <TimerBadge endsAt={battle.endsAt} />
               <span style={{ opacity: 0.85 }}>{fmt(msLeft)}</span>
             </div>
-            <div style={{ opacity: 0.85, fontSize: 12 }}>Power: {power} · Difficulty: {battle.difficulty}</div>
-            <Button disabled={remainingMs(battle.endsAt) > 0} onClick={resolve}>Resolve Battle</Button>
+            <div style={{ opacity: 0.85, fontSize: 12 }}>{(T.monster?.power ?? 'Power')}: {power} • {(T.monster?.difficulty ?? 'Difficulty')}: {battle.difficulty}</div>
+            <Button disabled={remainingMs(battle.endsAt) > 0} onClick={resolve}>{T.monster?.resolve ?? 'Resolve Battle'}</Button>
           </div>
         </section>
       )}

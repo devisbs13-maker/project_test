@@ -21,14 +21,14 @@ type Lang = "ru" | "en";
 const userLang = new Map<number, Lang>();
 const T = {
   ru: {
-    open_game: "Открыть игру",
-    browser: "Открыть в браузере",
-    start: "Добро пожаловать! Нажмите кнопку, чтобы открыть игру.",
-    start_no_https: "Для кнопки WebApp нужен HTTPS. Используйте ссылку ниже.",
-    help: ["/start — открыть игру","/ping — проверить задержку","/lang — выбрать язык (RU/EN)"].join("\n"),
-    lang_choose: "Выберите язык интерфейса",
-    lang_set: (l: string) => `Язык установлен: ${l.toUpperCase()}`,
-    pong: (ms: number) => `понг • ${ms} мс`,
+    open_game: "\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u0438\u0433\u0440\u0443",
+    browser: "\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u0432 \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0435",
+    start: "\u0414\u043e\u0431\u0440\u043e \u043f\u043e\u0436\u0430\u043b\u043e\u0432\u0430\u0442\u044c! \u041d\u0430\u0436\u043c\u0438\u0442\u0435 \u043a\u043d\u043e\u043f\u043a\u0443, \u0447\u0442\u043e\u0431\u044b \u043e\u0442\u043a\u0440\u044b\u0442\u044c \u0438\u0433\u0440\u0443.",
+    start_no_https: "\u041d\u0443\u0436\u0435\u043d HTTPS, \u0447\u0442\u043e\u0431\u044b \u043a\u043d\u043e\u043f\u043a\u0430 web_app \u0440\u0430\u0431\u043e\u0442\u0430\u043b\u0430 \u0432 \u0422\u0435\u043b\u0435\u0433\u0440\u0430\u043c. \u0418\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0439\u0442\u0435 \u0441\u0441\u044b\u043b\u043a\u0443 \u043d\u0438\u0436\u0435.",
+    help: ["/start \u2014 \u043e\u0442\u043a\u0440\u044b\u0442\u044c \u0438\u0433\u0440\u0443","/ping \u2014 \u043f\u0440\u043e\u0432\u0435\u0440\u0438\u0442\u044c \u0437\u0430\u0434\u0435\u0440\u0436\u043a\u0443","/lang \u2014 \u0432\u044b\u0431\u043e\u0440 \u044f\u0437\u044b\u043a\u0430 (RU/EN)"].join("\n"),
+    lang_choose: "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u044f\u0437\u044b\u043a",
+    lang_set: (l: string) => `\u042f\u0437\u044b\u043a \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043b\u0435\u043d: ${l.toUpperCase()}`,
+    pong: (ms: number) => `pong ${ms} ms`,
   },
   en: {
     open_game: "Open game",
@@ -38,7 +38,7 @@ const T = {
     help: ["/start - open game","/ping - check latency","/lang - choose language (RU/EN)"].join("\n"),
     lang_choose: "Choose language",
     lang_set: (l: string) => `Language set: ${l.toUpperCase()}`,
-    pong: (ms: number) => `pong • ${ms} ms`,
+    pong: (ms: number) => `pong in ${ms} ms`,
   },
 } as const;
 const L = (ctx: any) => T[userLang.get(Number(ctx.from?.id)) || "ru"];
@@ -88,7 +88,7 @@ bot.command("ping", async (ctx) => {
 bot.start({ onStart: (me) => logger.info(`Bot @${me.username} started (long polling)`) });
 
 // graceful shutdown
-const stop = async (signal: string) => { logger.info({ signal }, "Stopping bot…"); await bot.stop(); process.exit(0); };
+const stop = async (signal: string) => { logger.info({ signal }, "Stopping bot..."); await bot.stop(); process.exit(0); };
 process.on("SIGINT", () => stop("SIGINT"));
 process.on("SIGTERM", () => stop("SIGTERM"));
 
