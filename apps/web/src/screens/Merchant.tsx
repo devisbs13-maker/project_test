@@ -99,22 +99,22 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
 
   return (
     <div style={{display:'grid', gap:12, padding:16}}>
-      <Header title="РўРѕСЂРіРѕРІРµС†" gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} />
+      <Header title="Merchant" gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} />
 
       <div style={{display:'flex', gap:8}}>
-        <Button onClick={()=>setTab('buy')} disabled={tab==='buy'}>РљСѓРїРёС‚СЊ</Button>
-        <Button onClick={()=>setTab('sell')} disabled={tab==='sell'}>РџСЂРѕРґР°С‚СЊ</Button>
+        <Button onClick={()=>setTab('buy')} disabled={tab==='buy'}>Buy</Button>
+        <Button onClick={()=>setTab('sell')} disabled={tab==='sell'}>Sell</Button>
       </div>
 
       {tab==='buy' && (
         <section style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)'}}>
           <div style={{display:'flex', gap:8, marginBottom:8}}>
-            <Button onClick={()=>setCategory('resources')} disabled={category==='resources'}>Р РµСЃСѓСЂСЃС‹</Button>
-            <Button onClick={()=>setCategory('clothing')} disabled={category==='clothing'}>РћРґРµР¶РґР°</Button>
+            <Button onClick={()=>setCategory('resources')} disabled={category==='resources'}>Resources</Button>
+            <Button onClick={()=>setCategory('clothing')} disabled={category==='clothing'}>Armor</Button>
           </div>
 
           <div style={{display:'flex', gap:8, marginBottom:8}}>
-            <Button onClick={()=>setCategory('weapons')} disabled={category==='weapons'}>Оружие</Button>
+            <Button onClick={()=>setCategory('weapons')} disabled={category==='weapons'}>Weapons</Button>
           </div>
 
           {category==='resources' && (
@@ -132,7 +132,7 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
                         <div style={{opacity:.85, fontSize:12}}>Р¦РµРЅР°: в‚Ѕ {price}</div>
                       </div>
                     </div>
-                    <Button onClick={()=>buyFromCatalog(def.id)} disabled={cant}>РљСѓРїРёС‚СЊ</Button>
+                    <Button onClick={()=>buyFromCatalog(def.id)} disabled={cant}>Buy</Button>
                   </div>
                 );
               })}
@@ -162,7 +162,7 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
                                   <div style={{opacity:.85, fontSize:12}}>Р¦РµРЅР°: в‚Ѕ {price} {def.requiredLevel ? `вЂў СѓСЂ. ${def.requiredLevel}+` : ''}</div>
                                 </div>
                               </div>
-                              <Button onClick={()=>buyFromCatalog(def.id)} disabled={cant}>РљСѓРїРёС‚СЊ</Button>
+                              <Button onClick={()=>buyFromCatalog(def.id)} disabled={cant}>Buy</Button>
                             </div>
                           );
                         })}
@@ -197,7 +197,7 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
                                   <div style={{opacity:.85, fontSize:12}}>Цена: ₽ {price} {def.requiredLevel ? `и ур. ${def.requiredLevel}+` : ''}</div>
                                 </div>
                               </div>
-                              <Button onClick={()=>buyFromCatalog(def.id)} disabled={cant}>Купить</Button>
+                              <Button onClick={()=>buyFromCatalog(def.id)} disabled={cant}>Buy</Button>
                             </div>
                           );
                         })}
@@ -224,7 +224,7 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
                     <div style={{fontWeight:700}}>{it.name ?? def?.name ?? it.id} {def && <span style={{color:rarityColor(def.rarity), fontSize:12, marginLeft:6}}>Р РµРґРєРѕСЃС‚СЊ: {def.rarity}</span>}</div>
                     <div style={{opacity:.85, fontSize:12}}>Р¦РµРЅР° РїСЂРѕРґР°Р¶Рё: рџЄ™ {price}</div>
                   </div>
-                  <Button onClick={()=>sell(idx)}>РџСЂРѕРґР°С‚СЊ</Button>
+                  <Button onClick={()=>sell(idx)}>Buy</Button>
                 </div>
               );
             })}
@@ -234,6 +234,7 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
     </div>
   );
 }
+
 
 
 
