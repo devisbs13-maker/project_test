@@ -12,6 +12,7 @@ const Clan = lazy(() => import('./screens/Clan'));
 const ClanCreate = lazy(() => import('./screens/ClanCreate'));
 const ClanBrowse = lazy(() => import('./screens/ClanBrowse'));
 const Duel = lazy(() => import('./screens/Duel'));
+const Factions = lazy(() => import('./screens/Factions'));
 
 import type { Player } from './store/player';
 import { loadPlayer, savePlayer, tickEnergy, createPlayer, normalizePlayer } from './store/player';
@@ -65,7 +66,7 @@ function HomeRoute({ player, updatePlayer }: { player: Player; updatePlayer: (p:
       onOpenQuests={() => navigate('/quests')}
       onOpenJobs={() => navigate('/jobs')}
       onOpenArena={() => navigate('/duel')}
-      onOpenGuild={() => navigate('/clan')}
+      onOpenGuild={() => navigate('/factions')}
       onOpenCharacter={() => navigate('/character')}
     />
   );
@@ -148,6 +149,9 @@ export default function App() {
           <Route path="/clan/browse" element={player ? (
             <ClanBrowse player={player} onBack={() => history.back()} />
           ) : <Navigate to="/" replace />} />
+          <Route path="/factions" element={player ? (
+            <Factions player={player} onBack={() => history.back()} />
+          ) : <Navigate to="/" replace />} />
           <Route path="/duel" element={player ? (
             <Duel player={player} onBack={() => history.back()} />
           ) : <Navigate to="/" replace />} />
@@ -157,4 +161,3 @@ export default function App() {
     </div>
   );
 }
-

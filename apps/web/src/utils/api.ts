@@ -190,6 +190,24 @@ export async function apiDuelChallenge(): Promise<{ ok: boolean; id?: string; er
   return jsonOrError(res);
 }
 
+// Factions APIs
+export async function apiFactionList(): Promise<{ ok: boolean; items?: Array<{id:string; name:string; members:number}>; error?: string }> {
+  const res = await fetch(`${API_BASE}/faction/list`, withUserHeaders());
+  return jsonOrError(res);
+}
+export async function apiFactionMe(): Promise<{ ok: boolean; factionId?: string|null; error?: string }> {
+  const res = await fetch(`${API_BASE}/faction/me`, withUserHeaders());
+  return jsonOrError(res);
+}
+export async function apiFactionJoin(factionId: string): Promise<{ ok: boolean; factionId?: string; error?: string }> {
+  const res = await fetch(`${API_BASE}/faction/join`, withUserHeaders({ method:'POST', body: JSON.stringify({ factionId }) }));
+  return jsonOrError(res);
+}
+export async function apiFactionLeave(): Promise<{ ok: boolean; error?: string }> {
+  const res = await fetch(`${API_BASE}/faction/leave`, withUserHeaders({ method:'POST' }));
+  return jsonOrError(res);
+}
+
 export async function apiDuelAccept(id: string): Promise<{ ok: boolean; id?: string; error?: string }> {
   const res = await fetch(`${API_BASE}/duel/accept`, withUserHeaders({ method: 'POST', body: JSON.stringify({ id }) }));
   return jsonOrError(res);

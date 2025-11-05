@@ -60,3 +60,10 @@ model Duel {
   @@index([playerAId])
   @@index([playerBId])
 }
+
+/// Faction membership: each user can be in at most one faction
+model FactionMember {
+  userId    String  @id
+  factionId String
+  joinedAt  DateTime @default(now())
+}

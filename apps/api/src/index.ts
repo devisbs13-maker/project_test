@@ -10,6 +10,7 @@ import { clanRoutesV1 } from './routes/clans_v1.js';
 import { initStorage } from './repos/index.js';
 import { playerRoutes } from './routes/player.js';
 import { duelRoutes } from './routes/duel.js';
+import { factionRoutes } from './routes/faction.js';
 
 const server = Fastify({
   logger: {
@@ -49,6 +50,7 @@ await server.register(healthRoutes);
 await server.register(apiRoutes);
 await server.register(playerRoutes);
 await server.register(duelRoutes);
+await server.register(factionRoutes);
 await server.register(leaderboardRoutesV1);
 await server.register(clanRoutesV1);
 
@@ -62,4 +64,6 @@ server
     server.log.error(err, 'Failed to start server');
     process.exit(1);
   });
+
+
 
