@@ -72,6 +72,10 @@ export default function Character({ player, onBack, onUpdatePlayer }: Props) {
           <div>Телосложение: {estats.vit}</div>
         </div>
       </section>
+      <section style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)', boxShadow:'var(--shadow)'}}>
+        <b>Оружие</b>
+        <EquipRow label="Оружие" item={(player.equipment as any).weapon} onUnequip={() => unequip('weapon')} />
+      </section>
 
       <section style={{display:'grid', gap:10, gridTemplateColumns:'1fr 1fr', alignItems:'start'}}>
         <div style={{padding:12, borderRadius:16, background:'var(--panel-bg)', border:'var(--panel-border)', boxShadow:'var(--shadow)'}}>
@@ -112,4 +116,3 @@ function EquipRow({ label, item, onUnequip }: { label: string; item?: Item | nul
     </div>
   );
 }
-

@@ -7,6 +7,13 @@ const tiers = [
   { t:4, lvl:60,  rarity:'epic'     as const, price:1500 },
 ];
 
+// Extend catalog with class weapons (4 tiers each)
+CATALOG.push(
+  ...makeWeapons('warrior'),
+  ...makeWeapons('volkhv'),
+  ...makeWeapons('hunter'),
+);
+
 const slots = ['helmet','chest','pants','boots','gloves'] as const;
 
 function nameFor(cls: string, slot: string, tier: number): string {
@@ -30,6 +37,29 @@ function makeSet(cls: 'warrior'|'volkhv'|'hunter'): ItemDef[] {
         classReq: cls,
       });
     }
+  }
+  return out;
+}
+
+function weaponNameFor(cls: 'warrior'|'volkhv'|'hunter', tier: number): string {
+  const clsName: Record<string,string> = { warrior:'Warrior', volkhv:'Volkhv', hunter:'Hunter' };
+  const tierName = ['T1','T2','T3','T4'][tier-1] ?? `T${tier}`;
+  const weaponByClass: Record<string,string> = { warrior:'Sword', volkhv:'Staff', hunter:'Bow' };
+  return `${weaponByClass[cls]} ${tierName} ${clsName[cls]}`;
+}
+
+function makeWeapons(cls: 'warrior'|'volkhv'|'hunter'): ItemDef[] {
+  const out: ItemDef[] = [];
+  for (const { t, lvl, rarity, price } of tiers) {
+    out.push({
+      id: `${cls}_weapon_t${t}`,
+      name: weaponNameFor(cls, t),
+      slot: 'weapon',
+      rarity,
+      basePrice: Math.round(price * 1.5),
+      requiredLevel: lvl,
+      classReq: cls,
+    });
   }
   return out;
 }

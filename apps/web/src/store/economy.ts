@@ -4,7 +4,7 @@ export type Side = 'buy'|'sell';
 export type ItemDef = {
   id: string;
   name: string;
-  slot: 'helmet'|'chest'|'pants'|'boots'|'gloves'|'misc';
+  slot: 'helmet'|'chest'|'pants'|'boots'|'gloves'|'weapon'|'misc';
   rarity: Rarity;
   basePrice: number;      // for BUY baseline
   sellBase?: number;      // optional baseline for SELL (otherwise basePrice*0.45)

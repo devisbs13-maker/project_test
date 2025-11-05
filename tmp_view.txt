@@ -20,7 +20,7 @@ function rarityColor(r: string) {
 
 export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
   const [tab, setTab] = useState<'buy'|'sell'>('buy');
-  const [category, setCategory] = useState<'resources'|'clothing'|'weapons'>('resources');
+  const [category, setCategory] = useState<'resources'|'clothing'>('resources');
   const [slotTab, setSlotTab] = useState<'all'|'helmet'|'chest'|'pants'|'boots'|'gloves'|'misc'>('all');
   const [eco, setEco] = useState<MerchantState>(() => {
     const s = loadEconomy();
@@ -78,9 +78,8 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
   }
 
   const armorSlots = new Set(['helmet','chest','pants','boots','gloves','weapon']);
-  const clothingDefs = useMemo(() => CATALOG.filter(d => armorSlots.has(d.slot) && d.slot !== 'weapon'), []);
+  const clothingDefs = useMemo(() => CATALOG.filter(d => armorSlots.has(d.slot)), []);
   const resourceDefs = useMemo(() => CATALOG.filter(d => d.slot === 'misc'), []);
-  const weaponDefs = useMemo(() => CATALOG.filter(d => d.slot === 'weapon'), []);
 
   function sell(invIndex: number) {
     const it = player.inventory[invIndex];
@@ -111,10 +110,6 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
           <div style={{display:'flex', gap:8, marginBottom:8}}>
             <Button onClick={()=>setCategory('resources')} disabled={category==='resources'}>Р РµСЃСѓСЂСЃС‹</Button>
             <Button onClick={()=>setCategory('clothing')} disabled={category==='clothing'}>РћРґРµР¶РґР°</Button>
-          </div>
-
-          <div style={{display:'flex', gap:8, marginBottom:8}}>
-            <Button onClick={()=>setCategory('weapons')} disabled={category==='weapons'}>Оружие</Button>
           </div>
 
           {category==='resources' && (
@@ -163,41 +158,6 @@ export default function Merchant({ player, onBack, onUpdatePlayer }: Props) {
                                 </div>
                               </div>
                               <Button onClick={()=>buyFromCatalog(def.id)} disabled={cant}>РљСѓРїРёС‚СЊ</Button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {category==='weapons' && (
-            <div style={{display:'grid', gap:12, marginBottom:12}}>
-              {(['warrior','volkhv','hunter'] as const).map(cls => (
-                <div key={cls} style={{display:'grid', gap:8}}>
-                  {[1,2,3,4].map(tier => {
-                    const items = weaponDefs.filter(d => (d as any).classReq===cls && /_t\\d+$/.test(d.id) && d.id.endsWith(`t${tier}`));
-                    if (items.length===0) return null;
-                    return (
-                      <div key={`${cls}_t${tier}`} style={{display:'grid', gap:6}}>
-                        <div style={{opacity:.9, fontWeight:700}}>{`Weapons ${cls} t${tier}`}</div>
-                        {items.map(def => {
-                          const base = Math.round(def.basePrice * rarityFactor(def.rarity));
-                          const price = priceFor('buy', base, player);
-                          const cant = player.gold < price;
-                          return (
-                            <div key={def.id} style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'8px 12px', borderRadius:12, background:'var(--panel-bg)', border:'1px solid rgba(255,255,255,0.08)'}}>
-                              <div style={{display:'flex', alignItems:'center', gap:10}}>
-                                {def.image ? <img src={def.image} alt={def.name} style={{width:36,height:36,objectFit:'cover',borderRadius:6}} /> : <div style={{width:36,height:36,borderRadius:6,background:'rgba(255,255,255,0.07)'}} />}
-                                <div>
-                                  <div style={{fontWeight:700}}>{def.name} <span style={{color:rarityColor(def.rarity), fontSize:12, marginLeft:6}}>Раритет: {def.rarity}</span></div>
-                                  <div style={{opacity:.85, fontSize:12}}>Цена: ₽ {price} {def.requiredLevel ? `и ур. ${def.requiredLevel}+` : ''}</div>
-                                </div>
-                              </div>
-                              <Button onClick={()=>buyFromCatalog(def.id)} disabled={cant}>Купить</Button>
                             </div>
                           );
                         })}

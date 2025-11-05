@@ -2,7 +2,7 @@ export type ClassId = 'warrior' | 'volkhv' | 'hunter';
 
 export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic';
 // Expanded equipment slots for armor sets
-export type ItemSlot = 'helmet' | 'chest' | 'pants' | 'boots' | 'gloves' | 'misc';
+export type ItemSlot = 'helmet' | 'chest' | 'pants' | 'boots' | 'gloves' | 'weapon' | 'misc';
 
 export interface Item {
   id: string;
@@ -20,6 +20,7 @@ export interface Equipment {
   pants?: Item | null;
   boots?: Item | null;
   gloves?: Item | null;
+  weapon?: Item | null;
 }
 
 export interface Stats { str: number; agi: number; int: number; vit: number; }
@@ -103,14 +104,15 @@ export function normalizePlayer(raw: any): Player {
       pants:  (raw.equipment?.pants  ?? null) as any,
       boots:  (raw.equipment?.boots  ?? null) as any,
       gloves: (raw.equipment?.gloves ?? null) as any,
+      weapon: (raw.equipment?.weapon ?? null) as any,
     },
   };
   // Migration: if player has no new-slot items/equipment, seed starter set
   try {
     const hasAnyNewSlot = Array.isArray(p.inventory) && p.inventory.some(it => (
-      it && (it.slot === 'helmet' || it.slot === 'chest' || it.slot === 'pants' || it.slot === 'boots' || it.slot === 'gloves')
+      it && (it.slot === 'helmet' || it.slot === 'chest' || it.slot === 'pants' || it.slot === 'boots' || it.slot === 'gloves' || it.slot==='weapon')
     ));
-    const hasAnyEquipped = !!(p.equipment.helmet || p.equipment.chest || p.equipment.pants || p.equipment.boots || p.equipment.gloves);
+    const hasAnyEquipped = !!(p.equipment.helmet || p.equipment.chest || p.equipment.pants || p.equipment.boots || p.equipment.gloves || (p as any).equipment?.weapon);
     if (!hasAnyNewSlot && !hasAnyEquipped) {
       const starter = seedStarterItems(p.classId);
       // avoid duplicates by id
@@ -249,5 +251,7 @@ export function effectiveStats(p: Player): Stats {
   apply(eq.pants ?? null);
   apply(eq.boots ?? null);
   apply(eq.gloves ?? null);
+  // include weapon bonuses
+  apply(eq.weapon ?? null);
   return sum;
 }
