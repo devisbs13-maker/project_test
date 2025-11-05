@@ -14,7 +14,14 @@ export function initTelegram() {
     try {
       tg.ready?.();
       tg.expand?.();
-      tg.setBackgroundColor?.('#0b0b0b');
+      // Avoid warnings on older Telegram versions
+      try {
+        const ver = String((tg as any).version || '0.0');
+        const [maj, min] = ver.split('.').map((x: string) => parseInt(x, 10) || 0);
+        if (maj > 6 || (maj === 6 && min >= 1)) {
+          tg.setBackgroundColor?.('#0b0b0b');
+        }
+      } catch {}
     } catch {}
     return true;
   };
