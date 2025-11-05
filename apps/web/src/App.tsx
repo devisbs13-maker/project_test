@@ -1,4 +1,4 @@
-import React, { useEffect, useState, lazy, Suspense } from 'react';
+﻿import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 
 // Lazy-load screens to avoid cyclic/TDZ issues during initial boot
@@ -13,9 +13,9 @@ const ClanCreate = lazy(() => import('./screens/ClanCreate'));
 const ClanBrowse = lazy(() => import('./screens/ClanBrowse'));
 
 import type { Player } from './store/player';
-import { loadPlayer, savePlayer, tickEnergy, createPlayer } from './store/player';
+import { loadPlayer, savePlayer, tickEnergy, createPlayer, normalizePlayer } from './store/player';
 import { ensureDevSession } from './store/session';
-import { apiVerifyAuth } from './utils/api';
+import { apiVerifyAuth, apiPlayerMe, apiPlayerSave } from './utils/api';
 import { getTelegramUser } from './utils/telegram';
 import { notifyEnergyFull } from './utils/energy';
 import { showToast } from './utils/notify';
@@ -32,7 +32,7 @@ function usePlayerState() {
       const wasFull = player.energy >= player.energyMax;
       const next = tickEnergy(player);
       if (!wasFull && next.energy >= next.energyMax) {
-        try { showToast('Энергия полная ⚡'); } catch {}
+        try { showToast('Р­РЅРµСЂРіРёСЏ РїРѕР»РЅР°СЏ вљЎ'); } catch {}
         try { notifyEnergyFull(); } catch {}
       }
       if (next.energy !== player.energy || next.lastEnergyTs !== player.lastEnergyTs) {
@@ -63,7 +63,7 @@ function HomeRoute({ player, updatePlayer }: { player: Player; updatePlayer: (p:
       onUpdatePlayer={updatePlayer}
       onOpenQuests={() => navigate('/quests')}
       onOpenJobs={() => navigate('/jobs')}
-      onOpenArena={() => alert('Арена появится позже')}
+      onOpenArena={() => alert('РђСЂРµРЅР° РїРѕСЏРІРёС‚СЃСЏ РїРѕР·Р¶Рµ')}
       onOpenGuild={() => navigate('/clan')}
       onOpenCharacter={() => navigate('/character')}
     />
@@ -93,6 +93,15 @@ export default function App() {
         }
       } catch {}
 
+      // Load server snapshot if available
+      try {
+        const me = await apiPlayerMe();
+        if (me?.ok && (me as any).data?.data) {
+          const snap = normalizePlayer((me as any).data.data);
+          updatePlayer(snap);
+        }
+      } catch {}
+
       // Fallback: if API is unreachable but WebApp is present, use client-side TG user for display name
       try {
         const u = getTelegramUser();
@@ -105,6 +114,12 @@ export default function App() {
       } catch {}
     })();
   }, []);
+  // Persist to server when player changes (debounced)
+  useEffect(() => {
+    if (!player) return;
+    const id = setTimeout(() => { try { apiPlayerSave(player); } catch {} }, 600);
+    return () => clearTimeout(id);
+  }, [player]);
   return (
     <div className="app">
       <Suspense fallback={<div style={{padding:16}}>{'\\u0417\\u0430\\u0433\\u0440\\u0443\\u0437\\u043a\\u0430\\u2026'}</div>}>
@@ -140,3 +155,4 @@ export default function App() {
     </div>
   );
 }
+

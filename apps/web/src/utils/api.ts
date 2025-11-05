@@ -1,4 +1,4 @@
-import { getInitData } from './telegram';
+﻿import { getInitData } from './telegram';
 import type { Session } from '../store/session';
 import { saveSession, loadSession } from '../store/session';
 import type { ClanCreateRequest, ClanJoinRequest, ClanContributeRequest, ClanCreateResponse, ClanJoinResponse, ClanContributeResponse, ClanMeResponse, LeaderboardRow } from '@repo/shared';
@@ -163,5 +163,23 @@ export async function apiClanSearch(
   }
 }
 
+
+
+
+// Player persistence (DB-backed)
+export async function apiPlayerMe(): Promise<{ ok: boolean; data?: any; error?: string }> {
+  try {
+    const res = await fetch(`${API_BASE}/player/me`, withUserHeaders());
+    return jsonOrError(res);
+  } catch { return { ok:false, error:'network' }; }
+}
+
+export async function apiPlayerSave(snapshot: any): Promise<{ ok: boolean; data?: any; error?: string }> {
+  try {
+    const body = typeof snapshot === 'object' && snapshot && !('data' in snapshot) ? { data: snapshot } : snapshot;
+    const res = await fetch(`${API_BASE}/player/save`, withUserHeaders({ method:'POST', body: JSON.stringify(body) }));
+    return jsonOrError(res);
+  } catch { return { ok:false, error:'network' }; }
+}
 
 
