@@ -108,7 +108,7 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
 
   return (
     <div style={{ display: 'grid', gap: 12, padding: 16 }}>
-      <Header title="Р‘РѕР№ СЃ РјРѕРЅСЃС‚СЂРѕРј" gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} />
+      <Header title="Monster Hunt" gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} />
 
       {!active && (
         <section style={{ padding: 12, borderRadius: 16, background: 'var(--panel-bg)', border: 'var(--panel-border)' }}>
@@ -145,7 +145,7 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
                         </div>
                       </div>
                     </div>
-                    <Button onClick={() => fight(m)}>РЎСЂР°Р·РёС‚СЊСЃСЏ</Button>
+                    <Button onClick={() =>Fight</Button>
                   </div>
                 );
               })}
@@ -162,7 +162,7 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
               <TimerBadge endsAt={battle.endsAt} />
               <span style={{ opacity: 0.85 }}>{fmt(msLeft)}</span>
             </div>
-            <div style={{ opacity: 0.85, fontSize: 12 }}>РњРѕС‰СЊ: {power} вЂў РЎР»РѕР¶РЅРѕСЃС‚СЊ: {battle.difficulty}</div>
+            <div style={{ opacity: 0.85, fontSize: 12 }}>Power: {power} · Difficulty: {battle.difficulty}</div>
             <Button disabled={remainingMs(battle.endsAt) > 0} onClick={resolve}>
               Р—Р°РІРµСЂС€РёС‚СЊ Р±РѕР№
             </Button>
@@ -172,5 +172,6 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
     </div>
   );
 }
+
 
 
