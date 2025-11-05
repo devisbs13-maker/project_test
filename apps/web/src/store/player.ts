@@ -122,6 +122,14 @@ export function normalizePlayer(raw: any): Player {
       p = { ...p, inventory: merged };
     }
   } catch {}
+  // Ensure at least one starter weapon exists (for old saves)
+  try {
+    const hasWeapon = (p.equipment?.weapon != null) || (Array.isArray(p.inventory) && p.inventory.some(it => it?.slot === 'weapon'));
+    if (!hasWeapon) {
+      const starter = seedStarterItems(p.classId).find(it => it.slot === 'weapon');
+      if (starter) p = { ...p, inventory: [...(p.inventory || []), starter] };
+    }
+  } catch {}
   return p;
 }
 

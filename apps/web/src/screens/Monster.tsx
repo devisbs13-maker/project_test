@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import Header from '../components/Header';
 import Button from '../components/Button';
 import TimerBadge from '../components/TimerBadge';
@@ -39,7 +39,7 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
     try {
       const g = loadGame();
       if ((g.active || []).length > 0) {
-        alert('Сначала завершите текущие задания/работы.');
+        alert('РЎРЅР°С‡Р°Р»Р° Р·Р°РІРµСЂС€РёС‚Рµ С‚РµРєСѓС‰РёРµ Р·Р°РґР°РЅРёСЏ/СЂР°Р±РѕС‚С‹.');
         return;
       }
     } catch {}
@@ -93,22 +93,22 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
           pNext = { ...pNext, inventory: [...pNext.inventory, newItem] } as Player;
         }
       }
-      notifyAll('quest', 'Победа над монстром', { gold, xp });
+      notifyAll('quest', 'РџРѕР±РµРґР° РЅР°Рґ РјРѕРЅСЃС‚СЂРѕРј', { gold, xp });
       try {
-        showToast('Победа над монстром! Награда получена.');
+        showToast('РџРѕР±РµРґР° РЅР°Рґ РјРѕРЅСЃС‚СЂРѕРј! РќР°РіСЂР°РґР° РїРѕР»СѓС‡РµРЅР°.');
       } catch {}
       savePlayer(pNext);
       onUpdatePlayer(pNext);
     } else {
       try {
-        showToast('Поражение. Монстр оказался сильнее.');
+        showToast('РџРѕСЂР°Р¶РµРЅРёРµ. РњРѕРЅСЃС‚СЂ РѕРєР°Р·Р°Р»СЃСЏ СЃРёР»СЊРЅРµРµ.');
       } catch {}
     }
   }
 
   return (
     <div style={{ display: 'grid', gap: 12, padding: 16 }}>
-      <Header title="Бой с монстром" gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} />
+      <Header title="Р‘РѕР№ СЃ РјРѕРЅСЃС‚СЂРѕРј" gold={player.gold} energy={player.energy} level={player.progress.level} onBack={onBack} />
 
       {!active && (
         <section style={{ padding: 12, borderRadius: 16, background: 'var(--panel-bg)', border: 'var(--panel-border)' }}>
@@ -141,11 +141,11 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
                       <div>
                         <div style={{ fontWeight: 700 }}>{m.name}</div>
                         <div style={{ opacity: 0.85, fontSize: 12 }}>
-                          Сложность: {difficulty} • Шанс победы: {Math.round(chance * 100)}% • Награда x{m.rewardMul}
+                          РЎР»РѕР¶РЅРѕСЃС‚СЊ: {difficulty} вЂў РЁР°РЅСЃ РїРѕР±РµРґС‹: {Math.round(chance * 100)}% вЂў РќР°РіСЂР°РґР° x{m.rewardMul}
                         </div>
                       </div>
                     </div>
-                    <Button onClick={() => fight(m)}>Сразиться</Button>
+                    <Button onClick={() => fight(m)}>РЎСЂР°Р·РёС‚СЊСЃСЏ</Button>
                   </div>
                 );
               })}
@@ -162,9 +162,9 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
               <TimerBadge endsAt={battle.endsAt} />
               <span style={{ opacity: 0.85 }}>{fmt(msLeft)}</span>
             </div>
-            <div style={{ opacity: 0.85, fontSize: 12 }}>Мощь: {power} • Сложность: {battle.difficulty}</div>
+            <div style={{ opacity: 0.85, fontSize: 12 }}>РњРѕС‰СЊ: {power} вЂў РЎР»РѕР¶РЅРѕСЃС‚СЊ: {battle.difficulty}</div>
             <Button disabled={remainingMs(battle.endsAt) > 0} onClick={resolve}>
-              Завершить бой
+              Р—Р°РІРµСЂС€РёС‚СЊ Р±РѕР№
             </Button>
           </div>
         </section>
@@ -172,4 +172,5 @@ export default function Monster({ player, onBack, onUpdatePlayer }: Props) {
     </div>
   );
 }
+
 
