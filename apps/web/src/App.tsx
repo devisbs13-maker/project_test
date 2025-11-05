@@ -13,6 +13,7 @@ const ClanCreate = lazy(() => import('./screens/ClanCreate'));
 const ClanBrowse = lazy(() => import('./screens/ClanBrowse'));
 const Duel = lazy(() => import('./screens/Duel'));
 const Factions = lazy(() => import('./screens/Factions'));
+const ClassSelect = lazy(() => import('./screens/ClassSelect'));
 
 import type { Player } from './store/player';
 import { loadPlayer, savePlayer, tickEnergy, createPlayer, normalizePlayer } from './store/player';
@@ -74,14 +75,14 @@ function HomeRoute({ player, updatePlayer }: { player: Player; updatePlayer: (p:
 
 export default function App() {
   const { player, updatePlayer } = usePlayerState();
+  const [needsClass, setNeedsClass] = useState(false);
   useEffect(() => {
     ensureDevSession();
     (async () => {
       // Seed local player if missing
       let p = loadPlayer();
       if (!p) {
-        p = createPlayer('warrior', 'Warrior');
-        updatePlayer(p);
+        setNeedsClass(true);
       } else if (!player) {
         updatePlayer(p);
       }
@@ -124,7 +125,11 @@ export default function App() {
     <div className="app">
       <Suspense fallback={<div style={{padding:16}}>Loading…</div>}>
         <Routes>
-          <Route path="/" element={player ? <HomeRoute player={player} updatePlayer={updatePlayer} /> : <div style={{padding:16}}>Loading…</div>} />
+          <Route path="/" element={player ? (
+            <HomeRoute player={player} updatePlayer={updatePlayer} />
+          ) : needsClass ? (
+            <ClassSelect onPick={(p)=>{ updatePlayer(p); setNeedsClass(false); }} />
+          ) : <div style={{padding:16}}>Loading…</div>} />
           <Route path="/quests" element={player ? (
             <Quests player={player} onBack={() => history.back()} onUpdatePlayer={updatePlayer} />
           ) : <Navigate to="/" replace />} />

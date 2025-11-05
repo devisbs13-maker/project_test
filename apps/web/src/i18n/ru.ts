@@ -4,8 +4,8 @@
   buttons: {
     quests: 'Quests',
     jobs: 'Jobs',
-    arena: 'Arena (PvP, soon)',
-    guild: 'Guild (clans, soon)',
+    arena: 'PvP',
+    guild: 'Factions',
     character: 'Character',
     back: 'Back',
     backToVillage: 'Back to village',
