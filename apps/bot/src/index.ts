@@ -13,6 +13,10 @@ if (!BOT_TOKEN) {
 
 const bot = new Bot(BOT_TOKEN);
 
+// Ensure long polling does not conflict with any residual webhook
+// and drop pending updates to avoid 409 errors when another poller was running
+await bot.api.deleteWebhook({ drop_pending_updates: true }).catch(() => {});
+
 // basic logging
 bot.use(async (ctx, next) => {
   logger.debug({

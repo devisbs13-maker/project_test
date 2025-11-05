@@ -1,7 +1,7 @@
-﻿import React, { useEffect, useState, lazy, Suspense } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 
-// Lazy-load screens to avoid cyclic/TDZ issues during initial boot
+// Lazy-load screens to avoid TDZ/cycle issues
 const Home = lazy(() => import('./screens/Home'));
 const Jobs = lazy(() => import('./screens/Jobs'));
 const Quests = lazy(() => import('./screens/Quests'));
@@ -11,6 +11,7 @@ const Merchant = lazy(() => import('./screens/Merchant'));
 const Clan = lazy(() => import('./screens/Clan'));
 const ClanCreate = lazy(() => import('./screens/ClanCreate'));
 const ClanBrowse = lazy(() => import('./screens/ClanBrowse'));
+const Duel = lazy(() => import('./screens/Duel'));
 
 import type { Player } from './store/player';
 import { loadPlayer, savePlayer, tickEnergy, createPlayer, normalizePlayer } from './store/player';
@@ -32,7 +33,7 @@ function usePlayerState() {
       const wasFull = player.energy >= player.energyMax;
       const next = tickEnergy(player);
       if (!wasFull && next.energy >= next.energyMax) {
-        try { showToast('Р­РЅРµСЂРіРёСЏ РїРѕР»РЅР°СЏ вљЎ'); } catch {}
+        try { showToast('Energy is full'); } catch {}
         try { notifyEnergyFull(); } catch {}
       }
       if (next.energy !== player.energy || next.lastEnergyTs !== player.lastEnergyTs) {
@@ -63,7 +64,7 @@ function HomeRoute({ player, updatePlayer }: { player: Player; updatePlayer: (p:
       onUpdatePlayer={updatePlayer}
       onOpenQuests={() => navigate('/quests')}
       onOpenJobs={() => navigate('/jobs')}
-      onOpenArena={() => alert('РђСЂРµРЅР° РїРѕСЏРІРёС‚СЃСЏ РїРѕР·Р¶Рµ')}
+      onOpenArena={() => navigate('/duel')}
       onOpenGuild={() => navigate('/clan')}
       onOpenCharacter={() => navigate('/character')}
     />
@@ -78,12 +79,12 @@ export default function App() {
       // Seed local player if missing
       let p = loadPlayer();
       if (!p) {
-        p = createPlayer('warrior', '\\u0412\\u043e\\u0438\\u043d');
+        p = createPlayer('warrior', 'Warrior');
         updatePlayer(p);
       } else if (!player) {
         updatePlayer(p);
       }
-      // Try Telegram auth; if present, sync nickname to Telegram username/display name
+      // Try Telegram auth; if present, sync nickname
       try {
         const session = await apiVerifyAuth();
         if (session && p) {
@@ -92,7 +93,6 @@ export default function App() {
           }
         }
       } catch {}
-
       // Load server snapshot if available
       try {
         const me = await apiPlayerMe();
@@ -101,8 +101,7 @@ export default function App() {
           updatePlayer(snap);
         }
       } catch {}
-
-      // Fallback: if API is unreachable but WebApp is present, use client-side TG user for display name
+      // Fallback: WebApp user for display name
       try {
         const u = getTelegramUser();
         if (u && p) {
@@ -122,9 +121,9 @@ export default function App() {
   }, [player]);
   return (
     <div className="app">
-      <Suspense fallback={<div style={{padding:16}}>{'\\u0417\\u0430\\u0433\\u0440\\u0443\\u0437\\u043a\\u0430\\u2026'}</div>}>
+      <Suspense fallback={<div style={{padding:16}}>Loading…</div>}>
         <Routes>
-          <Route path="/" element={player ? <HomeRoute player={player} updatePlayer={updatePlayer} /> : <div style={{padding:16}}>{'\\u0417\\u0430\\u0433\\u0440\\u0443\\u0437\\u043a\\u0430\\u2026'}</div>} />
+          <Route path="/" element={player ? <HomeRoute player={player} updatePlayer={updatePlayer} /> : <div style={{padding:16}}>Loading…</div>} />
           <Route path="/quests" element={player ? (
             <Quests player={player} onBack={() => history.back()} onUpdatePlayer={updatePlayer} />
           ) : <Navigate to="/" replace />} />
@@ -148,6 +147,9 @@ export default function App() {
           ) : <Navigate to="/" replace />} />
           <Route path="/clan/browse" element={player ? (
             <ClanBrowse player={player} onBack={() => history.back()} />
+          ) : <Navigate to="/" replace />} />
+          <Route path="/duel" element={player ? (
+            <Duel player={player} onBack={() => history.back()} />
           ) : <Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

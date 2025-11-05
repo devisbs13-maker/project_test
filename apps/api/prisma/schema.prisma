@@ -46,3 +46,17 @@ model PlayerState {
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
 }
+
+/// Turn-based duel session
+model Duel {
+  id         String   @id @default(cuid())
+  status     String   // waiting | active | finished
+  playerAId  String
+  playerBId  String?
+  state      Json     // turn state, hp, log, currentTurn: 'A'|'B', winner
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([playerAId])
+  @@index([playerBId])
+}

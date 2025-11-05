@@ -184,4 +184,25 @@ export async function apiPlayerSave(snapshot: any): Promise<{ ok: boolean; data?
   } catch { return { ok:false, error:'network' }; }
 }
 
+// PvP Duel APIs
+export async function apiDuelChallenge(): Promise<{ ok: boolean; id?: string; error?: string }> {
+  const res = await fetch(`${API_BASE}/duel/challenge`, withUserHeaders({ method: 'POST' }));
+  return jsonOrError(res);
+}
+
+export async function apiDuelAccept(id: string): Promise<{ ok: boolean; id?: string; error?: string }> {
+  const res = await fetch(`${API_BASE}/duel/accept`, withUserHeaders({ method: 'POST', body: JSON.stringify({ id }) }));
+  return jsonOrError(res);
+}
+
+export async function apiDuelGet(id: string): Promise<{ ok: boolean; data?: any; error?: string }> {
+  const res = await fetch(`${API_BASE}/duel/${encodeURIComponent(id)}`, withUserHeaders());
+  return jsonOrError(res);
+}
+
+export async function apiDuelAct(id: string, action: 'attack'|'defend'|'skill'): Promise<{ ok: boolean; data?: any; error?: string }> {
+  const res = await fetch(`${API_BASE}/duel/act`, withUserHeaders({ method: 'POST', body: JSON.stringify({ id, action }) }));
+  return jsonOrError(res);
+}
+
 
