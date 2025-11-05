@@ -1,6 +1,6 @@
 import Header from '../components/Header';
 import Button from '../components/Button';
-import { getT, getLang, setLang } from '../i18n';
+import { RU } from '../i18n/ru';
 import { Player, ENERGY_REGEN_INTERVAL_MS } from '../store/player';
 import s from './Home.module.css';
 import { CLASS_ASSETS } from '../assets/classes';
@@ -22,7 +22,6 @@ type Props = {
 };
 
 export default function Home({ player, onOpenQuests, onOpenJobs, onOpenArena, onOpenGuild, onOpenCharacter, setScreen }: Props) {
-  const T = getT();
   const cls = CLASS_ASSETS[player.classId];
   const [clanTag, setClanTag] = useState<string | null>(null);
   const [msLeft, setMsLeft] = useState<number>(0);
@@ -30,11 +29,15 @@ export default function Home({ player, onOpenQuests, onOpenJobs, onOpenArena, on
   useEffect(() => {
     let done = false;
     (async () => {
-      try { const res = await apiClanMe(); if (!done && res?.ok && res.data) setClanTag(res.data.tag); } catch {}
+      try {
+        const res = await apiClanMe();
+        if (!done && res?.ok && res.data) setClanTag(res.data.tag);
+      } catch {}
     })();
     return () => { done = true; };
   }, []);
 
+  // Energy countdown (client-side)
   useEffect(() => {
     const recalc = () => setMsLeft(msToNextEnergy((player as any).lastEnergyTs, ENERGY_REGEN_INTERVAL_MS, player.energy, player.energyMax));
     recalc();
@@ -44,37 +47,38 @@ export default function Home({ player, onOpenQuests, onOpenJobs, onOpenArena, on
 
   return (
     <div className={s.wrap}>
-      <Header title={T.title} gold={player.gold} energy={player.energy} level={player.progress.level} badgeTag={clanTag} />
-      {player.name ? <div style={{ margin:'8px 14px', fontSize:12, opacity:.9 }}>@{player.name}</div> : null}
+      <Header title={RU.title} gold={player.gold} energy={player.energy} level={player.progress.level} badgeTag={clanTag} />
+      {player.name ? <div style={{ margin:'8px 14px', fontSize:12, opacity:.9 }}>👤 {player.name}</div> : null}
 
       {player.energy < player.energyMax ? (
-        <div style={{ margin:'0 14px 8px', fontSize:12, opacity:.75 }}>+1 {T.stats.energy}: {formatRemaining(msLeft)}</div>
+        <div style={{ margin:'0 14px 8px', fontSize:12, opacity:.75 }}>⚡ +1 через: {formatRemaining(msLeft)}</div>
       ) : null}
 
       <section className={`${s.panel} ${s.panelGlow} ${s.appear}`}>
         <PortraitCard
           img={cls.img}
-          title={`${player.name ? `${player.name} • ` : ''}${cls.title}`}
-          subtitle={`${cls.desc}. ${T.stats.level} ${player.progress.level} • ${T.stats.energy}: ${player.energy}/${player.energyMax}`}
+          title={`${player.name ? `👤 ${player.name} • ` : ''}${cls.title}`}
+          subtitle={`${cls.desc}. ${RU.stats.level} ${player.progress.level} • ${RU.stats.energy}: ${player.energy}/${player.energyMax}`}
           size="md"
           rightSlot={
             <div style={{display:'flex', gap:8}}>
-              <Button className={s.btnFull} onClick={() => setScreen?.('square')}>{T.navWhere}</Button>
-              <Button className={s.btnFull} onClick={onOpenCharacter}>{T.buttons.character}</Button>
+              <Button className={s.btnFull} onClick={() => setScreen?.('square')}>{RU.navWhere}</Button>
+              <Button className={s.btnFull} onClick={onOpenCharacter}>{RU.buttons.character}</Button>
             </div>
           }
         />
       </section>
 
       <section className={`${s.panel} ${s.panelGlow} ${s.appear}`}>
-        <div className={s.titleRow}><span style={{opacity:.85}}>{T.navWhere}</span></div>
+        <div className={s.titleRow}><span style={{opacity:.85}}>{RU.navWhere}</span></div>
         <div className={s.buttonList}>
-          <Button className={s.btnFull} onClick={() => { setScreen?.('quests'); onOpenQuests(); }}>{T.buttons.quests}</Button>
-          <Button className={s.btnFull} onClick={() => { setScreen?.('jobs'); onOpenJobs(); }}>{T.buttons.jobs}</Button>
-          <Button className={s.btnFull} onClick={() => setScreen?.('monster')}>{T.buttons.monster}</Button>
-          <Button className={s.btnFull} onClick={() => setScreen?.('merchant')}>{T.buttons.merchant}</Button>
-          <Button className={s.btnFull} onClick={onOpenArena}>{T.buttons.arena}</Button>
-          <Button className={s.btnFull} onClick={onOpenGuild}>{T.buttons.guild}</Button>
+          <Button className={s.btnFull} onClick={() => { setScreen?.('quests'); onOpenQuests(); }}>{RU.buttons.quests}</Button>
+          <Button className={s.btnFull} onClick={() => { setScreen?.('jobs'); onOpenJobs(); }}>{RU.buttons.jobs}</Button>
+          <Button className={s.btnFull} onClick={() => setScreen?.('monster')}>Бой с монстром</Button>
+          <Button className={s.btnFull} onClick={() => setScreen?.('merchant')}>Торговец</Button>
+          <Button className={s.btnFull} onClick={() => setScreen?.('leaderboard')}>Таблица лидеров</Button>
+          <Button className={s.btnFull} onClick={onOpenArena}>{RU.buttons.arena}</Button>
+          <Button className={s.btnFull} onClick={onOpenGuild}>{RU.buttons.guild}</Button>
         </div>
       </section>
       <section className={`${s.panel} ${s.appear}`}>
@@ -85,13 +89,6 @@ export default function Home({ player, onOpenQuests, onOpenJobs, onOpenArena, on
             style={{background:'transparent', border:'none', color:'var(--gold)', cursor:'pointer', fontSize:12, textDecoration:'underline'}}
             aria-label="reset-profile"
           >Сбросить персонажа</button>
-        </div>
-        <div style={{marginTop:8}}>
-          <button
-            onClick={() => { const cur = getLang(); const next = cur === 'ru' ? 'en' : 'ru'; setLang(next as any); location.reload(); }}
-            className="mire-btn"
-            style={{padding:'6px 10px', borderRadius:10}}
-          >{T.buttons.language}: {getLang().toUpperCase()}</button>
         </div>
       </section>
     </div>

@@ -1,1 +1,0 @@
-System.register([],function(e,t){"use strict";return{execute:function(){e("R",{title:"Mini RPG",navWhere:"Where to?",buttons:{quests:"Quests",jobs:"Jobs",arena:"PvP",guild:"Factions",character:"Character"},stats:{energy:"Energy",level:"Lvl."},clans:{search:"Search clan"}})}}});
