@@ -69,11 +69,5 @@ export const PlayerSchema = z.object({
   quests: z.array(QuestSchema).optional(),
 });
 
-export type Job = z.infer<typeof JobSchema>;
-export type Quest = z.infer<typeof QuestSchema>;
-export type ArenaOpponent = z.infer<typeof ArenaOpponentSchema>;
-export type BattleResult = z.infer<typeof BattleResultSchema>;
-export type Payment = z.infer<typeof PaymentSchema>;
-export type PlayerJob = z.infer<typeof PlayerJobSchema>;
-export type Player = z.infer<typeof PlayerSchema>;
-
+// Note: Do not re-export inferred types with names that clash with interfaces in types.ts
+// Importers should use the explicit interfaces from types.ts or infer locally if needed.
