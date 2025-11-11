@@ -3,7 +3,12 @@ import { PrismaClient } from '@prisma/client';
 export const prisma = new PrismaClient();
 
 export async function ensureSchema() {
-  // Create tables if they don't exist (idempotent) for dev convenience
+  // Skip manual DDL when not using SQLite (MySQL/MariaDB handled by Prisma migrations)
+  const url = String(process.env.DATABASE_URL || '').toLowerCase();
+  const isSqlite = url.startsWith('file:') || url.startsWith('sqlite:') || url === '';
+  if (!isSqlite || String(process.env.SKIP_ENSURE_SCHEMA || '').toLowerCase() === 'true') return;
+
+  // Create tables if they don't exist (idempotent) for local dev convenience
   await prisma.$executeRawUnsafe(`
     CREATE TABLE IF NOT EXISTS User (
       id TEXT PRIMARY KEY,
@@ -31,4 +36,3 @@ export async function ensureSchema() {
     );
   `);
 }
-
