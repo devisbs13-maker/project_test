@@ -12,7 +12,7 @@
         "dev:api": "npm run -w @repo/api dev",
         "dev:bot": "npm run -w slav-rpg-bot dev:bot",
     "dev:all": "bash scripts/dev-all.sh",
-        "build": "npm run -ws build",
+        "build": "npm run -ws --if-present build",
         "build:web": "npm run -w @repo/web build",
         "build:api": "npm run -w @repo/api build",
         "build:bot": "npm run -w slav-rpg-bot build:bot",
@@ -25,6 +25,7 @@
         "deploy:web": "npm run -w @repo/web deploy:docs"
   },
   "devDependencies": {
+        "@types/node": "^20.11.30",
         "@typescript-eslint/eslint-plugin": "^7.17.0",
         "@typescript-eslint/parser": "^7.17.0",
         "concurrently": "^8.2.2",
