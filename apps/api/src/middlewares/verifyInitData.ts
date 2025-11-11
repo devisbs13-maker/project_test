@@ -1,8 +1,6 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import crypto from 'node:crypto';
-import { db } from '../db/client.js';
-import { players } from '../db/schema.js';
-import { eq } from 'drizzle-orm';
+import { getOrCreateUser } from '../repos/index.js';
 
 export function parseInitData(raw: string): Record<string, string> {
   const out: Record<string, string> = {};
@@ -38,19 +36,10 @@ export function verifySignature(initData: Record<string, string>, botToken: stri
 export async function ensurePlayer(userPayload: any): Promise<string> {
   const tgId: string = String(userPayload?.id ?? '');
   if (!tgId) throw new Error('Invalid telegram user id');
-  const existing = db.select().from(players).where(eq(players.id, tgId)).all();
   const desiredName = [userPayload?.first_name, userPayload?.last_name].filter(Boolean).join(' ')
     || userPayload?.username
     || `tg_${tgId}`;
-  if (existing.length > 0) {
-    // Update name if changed to keep nickname in sync with Telegram
-    if (existing[0].name !== desiredName) {
-      db.run(`UPDATE players SET name = ? WHERE id = ?`, [desiredName, tgId]);
-    }
-    return existing[0].id;
-  }
-
-  db.insert(players).values({ id: tgId, name: desiredName, level: 1, class: 'Warrior', gold: 0 }).run();
+  await getOrCreateUser(tgId, desiredName);
   return tgId;
 }
 
@@ -97,14 +86,11 @@ export async function verifyInitData(app: FastifyInstance) {
     }
     try {
       const playerId = userPayload ? await ensurePlayer(userPayload) : 'local-user';
-      // attach to request
-      // @ts-expect-error augmented via declaration merging
-      req.playerId = playerId;
-      // @ts-expect-error augmented via declaration merging
-      req.tgUserId = String(userPayload?.id || 'local-user');
-      // @ts-expect-error augmented via declaration merging
-      req.tgUserName = [userPayload?.first_name, userPayload?.last_name].filter(Boolean).join(' ') || userPayload?.username || 'Путник';
-      req.log.info({ tgUserId: req.tgUserId, tgUserName: req.tgUserName }, 'auth');
+      // attach to request (loose typing)
+      (req as any).playerId = playerId;
+      (req as any).tgUserId = String(userPayload?.id || 'local-user');
+      (req as any).tgUserName = [userPayload?.first_name, userPayload?.last_name].filter(Boolean).join(' ') || userPayload?.username || 'Adventurer';
+      req.log.info({ tgUserId: (req as any).tgUserId, tgUserName: (req as any).tgUserName }, 'auth');
     } catch (e) {
       app.log.error({ err: e }, 'Failed to ensure player');
       reply.code(500).send({ error: 'Failed to process player' });
@@ -112,3 +98,4 @@ export async function verifyInitData(app: FastifyInstance) {
     }
   });
 }
+

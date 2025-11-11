@@ -11,4 +11,6 @@
     "sourceMap": true
   },
   "include": ["src"]
+  ,
+  "exclude": ["src/db/**", "src/routes/clans.ts", "src/routes/leaderboard.ts"]
 }
